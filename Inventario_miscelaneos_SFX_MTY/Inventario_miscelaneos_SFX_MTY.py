@@ -1,8 +1,9 @@
+import tkinter
+from tkinter import ANCHOR, CENTER, Label, ttk
 from tkinter.font import Font
 from typing import Self
 import pyodbc
 import tkinter as tk
-from tkinter import CENTER, Frame, Label, ttk
 from tkinter import messagebox
 from PIL import Image, ImageTk
 
@@ -22,87 +23,40 @@ except Exception as e:
     print(f"Error: {e}")
 
 
-
-def Salir_app():
-    ventana_princ.destroy()
-
-
-def Interfaz_entradas():
-    #Destruir widgets actuales
-    titulo_inv_misc.destroy()
-    boton_entradas.destroy()
-    boton_salidas.destroy()
-    boton_salir.destroy()
-
-    #crear nuevos widgets para la interfaz entradas
-    titulo_entradas = Label(ventana_princ, text="Entradas")
-    titulo_entradas.pack(anchor=tk.CENTER)
-
-    #se agrega combox para lista desplegable de productos
-    combo.place(x=200, y=35)
-
-    #agregar boton que cargara la informacion del combobox
-    boton_cargar = tk.Button(ventana_princ, text="Cargar informacion", command=cargar_productos)
-    boton_cargar.place(x=80, y=35)
-
-    entry.place(x=200, y=75)
-
-    boton_guardar = tk.Button(ventana_princ, text="Guardar", command=guardar_entrada)
-    boton_guardar.place(x=200, y=140)
-
-    #Boton para volver
-    boton_volver = tk.Button(ventana_princ, text="Volver", command=volver_inter_prin)
-    boton_volver.place(x=430, y=140)
-
-
-def Interfaz_salidas():
-    #Destruir widgets actuales
-    titulo_inv_misc.destroy()
-    boton_entradas.destroy()
-    boton_salidas.destroy()
-    boton_salir.destroy()
-
-    #crear nuevos widgets para la interfaz entradas
-    titulo_salidas = Label(ventana_princ, text="Salidas")
-    titulo_salidas.pack(anchor=tk.CENTER)
-
-    #se agrega combox para lista desplegable de productos
-    combo.place(x=200, y=35)
-
-    #agregar boton que cargara la informacion del combobox
-    boton_cargar_sal = tk.Button(ventana_princ, text="Cargar informacion", command=cargar_productos)
-    boton_cargar_sal.place(x=80, y=35)
-
-    entry.place(x=200, y=75)
-
-    boton_guardar_sal = tk.Button(ventana_princ, text="Guardar", command=guardar_salida)
-    boton_guardar_sal.place(x=200, y=140)
-
-    #Boton para volver
-    boton_volver = tk.Button(ventana_princ, text="Volver", command=volver_inter_prin)
-    boton_volver.place(x=430, y=140)
-
-
-def volver_inter_prin():
-    global titulo_inv_misc, boton_entradas, boton_salidas, boton_salir
-
-    #Eliminar widgets actuales
+def show_entradas():
     for widget in ventana_princ.winfo_children():
-        if widget not in [titulo_inv_misc, boton_entradas, boton_salidas, boton_salir]:
-            widget.destroy()
+        widget.place_forget()
 
-    titulo_inv_misc = Label(ventana_princ, text="\nBienvenido al Sistema de Inventario Miscelaneos SFX MTY! \n Que movimiento desea hacer?")
-    titulo_inv_misc.pack(anchor=tk.CENTER)
-    titulo_inv_misc.config(fg="black", font=("Verdana, 12"))
+    titulo_entradas.pack(anchor=tk.CENTER)
+    combo.place(x=200, y =35)
+    boton_cargar.place(x=50, y=35)
+    entry.place(x=200, y=75)
+    boton_guardar.place(x=230, y=150)
+    boton_volver.place(x=300, y=150)
 
-    boton_entradas = tk.Button(ventana_princ, text="Entradas", command=Interfaz_entradas)
-    boton_entradas.place(x=50, y=125)
 
-    boton_salidas = tk.Button(ventana_princ, text="Salidas")
-    boton_salidas.place(x=230, y=125)
 
-    boton_salir = tk.Button(ventana_princ, text="Salir", command=Salir_app)
-    boton_salir.place(x=400, y=125)
+def show_salidas():
+    for widget in ventana_princ.winfo_children():
+        widget.place_forget()
+
+    titulo_salidas.pack(anchor=tk.CENTER)
+    combo.place(x=200, y=35)
+    boton_cargar_sal.place(x=50, y=35)
+    entry.place(x=200, y=75)
+    boton_guardar_sal.place(x=230, y=150)
+    boton_volver.place(x=300, y=150)
+
+
+def show_main():
+    for widget in ventana_princ.winfo_children():
+        widget.place_forget()
+
+
+
+        boton_entradas.place(x=50, y=140)
+        boton_salidas.place(x=225, y=140)
+        boton_salir.place(x=395, y=140)
 
 def cargar_productos():
     try:
@@ -112,8 +66,6 @@ def cargar_productos():
     except Exception as e:
         print(f"Error al cargar productos: {e}")
         
-
-
 #funcion para guardar stock entrada
 def guardar_entrada():
     #Recuperer el nombre del producto seleccionado en el combobox
@@ -171,36 +123,41 @@ def guardar_salida():
     else:
         print("Por favor, selecciona un producto e ingresa una cantidad.")
 
+def Salir_app():
+    ventana_princ.destroy()
 
 
 #Interfaz principal
 ventana_princ = tk.Tk()
 ventana_princ.title("Inventario Miscelaneos SFX MTY")
-
-
-ventana_princ.iconbitmap("avion.ico")
-
 ventana_princ.geometry("500x200")
 ventana_princ.resizable(width=False, height=False)
 
+img = ImageTk.PhotoImage(Image.open("capy.jpg")),
+Label(ventana_princ, image=img, anchor="nw").pack()
 
-titulo_inv_misc = Label(ventana_princ, text="\nBienvenido al Sistema de Inventario Miscelaneos SFX MTY! \n Que movimiento desea hacer?")
-titulo_inv_misc.pack(anchor=CENTER)
-titulo_inv_misc.config(fg="black",
-                       font=("Verdana, 12"))
+ventana_princ.iconbitmap("avion.ico")
 
-boton_entradas = tk.Button(ventana_princ, text="Entradas", command=Interfaz_entradas)
-boton_entradas.place(x=50, y=125)
+boton_entradas = tk.Button(ventana_princ, text="Entradas", command=show_entradas)
 
-boton_salidas = tk.Button(ventana_princ, text="Salidas", command=Interfaz_salidas)
-boton_salidas.place(x=230, y=125)
+boton_salidas = tk.Button(ventana_princ, text="Salidas", command=show_salidas)
 
-boton_salir = tk.Button(ventana_princ, text="Salir", command=ventana_princ.quit)
-boton_salir.place(x=400, y=125)
+boton_salir = tk.Button(ventana_princ, text="Salir", command=Salir_app)
+
+
+titulo_entradas = tk.Label(ventana_princ, text="Entradas")
+boton_cargar = tk.Button(ventana_princ, text="Cargar informacion", command=cargar_productos)
+entry = tk.Entry(ventana_princ)
+boton_guardar = tk.Button(ventana_princ, text="Guardar", command=guardar_entrada)
+boton_volver = tk.Button(ventana_princ, text="Volver", command=show_main)
+
+titulo_salidas = tk.Label(ventana_princ, text="Salidas")
+boton_cargar_sal = tk.Button(ventana_princ, text="Cargar informacion", command=cargar_productos)
+boton_guardar_sal = tk.Button(ventana_princ, text="Guardar", command=guardar_salida)
 
 combo = ttk.Combobox(ventana_princ, font=Font(size=15))
-entry = tk.Entry(ventana_princ)
 
+show_main()
 
 #Ejecutar interfaz principal
 ventana_princ.mainloop()

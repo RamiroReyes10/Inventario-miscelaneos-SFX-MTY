@@ -1,7 +1,6 @@
 import tkinter
 from tkinter import ANCHOR, CENTER, Label, ttk
 from tkinter.font import Font
-from typing import Self
 import pyodbc
 import tkinter as tk
 from tkinter import messagebox
@@ -18,7 +17,7 @@ try:
     connection = pyodbc.connect(cadena_conection)
     cursor = connection.cursor()
 
-
+    
 except Exception as e:
     print(f"Error: {e}")
 
@@ -35,7 +34,6 @@ def show_entradas():
     boton_volver.place(x=300, y=150)
 
 
-
 def show_salidas():
     for widget in ventana_princ.winfo_children():
         widget.place_forget()
@@ -48,14 +46,33 @@ def show_salidas():
     boton_volver.place(x=300, y=150)
 
 
+def show_registros():
+    for widget in ventana_princ.winfo_children():
+        widget.place_forget()
+
+        boton_reg_entradas.place(x=40, y =40)
+        boton_reg_salidas.place(x=40, y=85)
+        boton_inventario.place(x=40, y=135)
+        boton_volver.place(x=380, y=150)
+
+        titulo_reg = tk.Label(ventana_princ, text="Que informacion deseas ver?")
+        titulo_reg.place(x=210, y=13)
+        titulo_reg.config(bg="white",
+                          font=("Arial Black",12))
+
+
 def show_main():
     for widget in ventana_princ.winfo_children():
         widget.place_forget()
 
-
+        titulo = tk.Label(ventana_princ, text="Bienvenido al Sistema de Inventario Miscelaneos SFX MTY! \n Que movimiento desea hacer?")
+        titulo.place(x=50, y=4)
+        titulo.config(bg="white",
+                      font=("Arial Black",10))
 
         boton_entradas.place(x=50, y=140)
-        boton_salidas.place(x=225, y=140)
+        boton_salidas.place(x=175, y=140)
+        boton_registros.place(x=290, y=140)
         boton_salir.place(x=395, y=140)
 
 def cargar_productos():
@@ -133,17 +150,15 @@ ventana_princ.title("Inventario Miscelaneos SFX MTY")
 ventana_princ.geometry("500x200")
 ventana_princ.resizable(width=False, height=False)
 
-img = ImageTk.PhotoImage(Image.open("capy.jpg")),
+img = ImageTk.PhotoImage(Image.open("capy.jpg"))
 Label(ventana_princ, image=img, anchor="nw").pack()
 
 ventana_princ.iconbitmap("avion.ico")
 
 boton_entradas = tk.Button(ventana_princ, text="Entradas", command=show_entradas)
-
 boton_salidas = tk.Button(ventana_princ, text="Salidas", command=show_salidas)
-
+boton_registros = tk.Button(ventana_princ, text="Registros", command=show_registros)
 boton_salir = tk.Button(ventana_princ, text="Salir", command=Salir_app)
-
 
 titulo_entradas = tk.Label(ventana_princ, text="Entradas")
 boton_cargar = tk.Button(ventana_princ, text="Cargar informacion", command=cargar_productos)
@@ -154,6 +169,10 @@ boton_volver = tk.Button(ventana_princ, text="Volver", command=show_main)
 titulo_salidas = tk.Label(ventana_princ, text="Salidas")
 boton_cargar_sal = tk.Button(ventana_princ, text="Cargar informacion", command=cargar_productos)
 boton_guardar_sal = tk.Button(ventana_princ, text="Guardar", command=guardar_salida)
+
+boton_reg_entradas = tk.Button(ventana_princ, text="Registro de entradas")
+boton_reg_salidas = tk.Button(ventana_princ, text="Registro de Salidas")
+boton_inventario = tk.Button(ventana_princ, text="Inventario")
 
 combo = ttk.Combobox(ventana_princ, font=Font(size=15))
 

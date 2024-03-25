@@ -3,6 +3,7 @@ from tkinter import ANCHOR, CENTER, Label, ttk
 from tkinter.font import Font
 import pyodbc
 import tkinter as tk
+import pandas as pd
 from tkinter import messagebox
 from PIL import Image, ImageTk
 
@@ -10,8 +11,13 @@ Server = "SFX02EU8JX4HK3"
 Database = "miscelaneos_db "
 user = "RamiroSFXPruebas"
 password = "Danganronpa10"
-cadena_conection = f"DRIVER={{SQL SERVER}};SERVER={Server};DATABASE={Database};UID={user};PWD={password}"
 
+from sqlalchemy.engine import URL
+cadena_conection = f"DRIVER={{SQL SERVER}};SERVER={Server};DATABASE={Database};UID={user};PWD={password}"
+url_conection = URL.create("mssql+pyodbc", query={"odbc_connect": cadena_conection})
+
+from sqlalchemy import create_engine
+engine = create_engine(url_conection)
 
 try: 
     connection = pyodbc.connect(cadena_conection)
@@ -91,7 +97,7 @@ def guardar_entrada():
     #Recuperar la cantidad ingresada en el Entry
     cantidad = entry.get()
 
-    #Verificart que los campos no esten vacios
+    #Verificar que los campos no esten vacios
     if nombre_del_producto and cantidad:
         try:
             #convertir la cantidad a int
@@ -140,17 +146,51 @@ def guardar_salida():
     else:
         print("Por favor, selecciona un producto e ingresa una cantidad.")
 
+
+def export_excel_inventario():
+    try:
+        query_inventario = "select * from dbo.inventarios"
+        with engine.begin() as cursor:
+             df_i = pd.read_sql(query_inventario, cursor)
+             excel_file_inven = "Inventario.xlsx"
+             df_i.to_excel(excel_file_inven, index=False)
+
+    except Exception as e:
+        messagebox.showerror("Error", f"Error al exportar la informacion del inventario a excel: {str(e)}")
+
+def export_excel_entradas():
+    try:
+        query_entradas = "select * from dbo.entradas;"
+        with engine.begin() as cursor:
+             df_i = pd.read_sql(query_entradas, cursor)
+             excel_file_ent = "entradas.xlsx"
+             df_i.to_excel(excel_file_ent, index=False)
+
+    except Exception as e:
+        messagebox.showerror("Error", f"Error al exportar la informacion de las entradas a excel: {str(e)}")
+
+def export_excel_salidas():
+    try:
+        query_salidas = "select * from dbo.salidas;"
+        with engine.begin() as cursor:
+             df_i = pd.read_sql(query_salidas, cursor)
+             excel_file_sal = "salidas.xlsx"
+             df_i.to_excel(excel_file_sal, index=False)
+
+    except Exception as e:
+        messagebox.showerror("Error", f"Error al exportar la informacion de las salidas a excel: {str(e)}")
+
 def Salir_app():
     ventana_princ.destroy()
 
 
-#Interfaz principal
+#Interfaz principal y funciones 
 ventana_princ = tk.Tk()
 ventana_princ.title("Inventario Miscelaneos SFX MTY")
 ventana_princ.geometry("500x200")
 ventana_princ.resizable(width=False, height=False)
 
-img = ImageTk.PhotoImage(Image.open("capy.jpg"))
+img = ImageTk.PhotoImage(Image.open("capy.jpg")) 
 Label(ventana_princ, image=img, anchor="nw").pack()
 
 ventana_princ.iconbitmap("avion.ico")
@@ -170,9 +210,9 @@ titulo_salidas = tk.Label(ventana_princ, text="Salidas")
 boton_cargar_sal = tk.Button(ventana_princ, text="Cargar informacion", command=cargar_productos)
 boton_guardar_sal = tk.Button(ventana_princ, text="Guardar", command=guardar_salida)
 
-boton_reg_entradas = tk.Button(ventana_princ, text="Registro de entradas")
-boton_reg_salidas = tk.Button(ventana_princ, text="Registro de Salidas")
-boton_inventario = tk.Button(ventana_princ, text="Inventario")
+boton_reg_entradas = tk.Button(ventana_princ, text="Registro de entradas", command=export_excel_entradas)
+boton_reg_salidas = tk.Button(ventana_princ, text="Registro de Salidas", command=export_excel_salidas)
+boton_inventario = tk.Button(ventana_princ, text="Inventario", command=export_excel_inventario)
 
 combo = ttk.Combobox(ventana_princ, font=Font(size=15))
 

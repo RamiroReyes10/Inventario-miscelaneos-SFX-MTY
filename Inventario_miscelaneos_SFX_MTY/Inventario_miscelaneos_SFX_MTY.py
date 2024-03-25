@@ -1,5 +1,6 @@
 import tkinter
 from tkinter import ANCHOR, CENTER, Label, ttk
+from tkinter import filedialog
 from tkinter.font import Font
 import pyodbc
 import tkinter as tk
@@ -152,8 +153,14 @@ def export_excel_inventario():
         query_inventario = "select * from dbo.inventarios"
         with engine.begin() as cursor:
              df_i = pd.read_sql(query_inventario, cursor)
-             excel_file_inven = "Inventario.xlsx"
-             df_i.to_excel(excel_file_inven, index=False)
+             file_path_inv = filedialog.asksaveasfilename(defaultextension='xlsx',
+                                                          filetypes=[("Excel files", "*.xlsx")])
+             if file_path_inv == "":
+                messagebox.showinfo("Informacion", "Informacion Cancelada sin guardar!")
+                return
+
+             df_i.to_excel(file_path_inv, index=False)
+             messagebox.showinfo("Exito!", "Informacion guardada correctamente")
 
     except Exception as e:
         messagebox.showerror("Error", f"Error al exportar la informacion del inventario a excel: {str(e)}")
@@ -163,8 +170,14 @@ def export_excel_entradas():
         query_entradas = "select * from dbo.entradas;"
         with engine.begin() as cursor:
              df_i = pd.read_sql(query_entradas, cursor)
-             excel_file_ent = "entradas.xlsx"
-             df_i.to_excel(excel_file_ent, index=False)
+             file_path_ent = filedialog.asksaveasfilename(defaultextension='xlsx',
+                                                          filetypes=[("Excel files", "*.xlsx")])
+             if  file_path_ent == "":
+                 messagebox.showinfo("Informacion", "Informacion Cancelada sin guardar!")
+                 return
+
+             df_i.to_excel(file_path_ent, index=False)
+             messagebox.showinfo("Exito", "Informacion exportada a Excel correctamente!")
 
     except Exception as e:
         messagebox.showerror("Error", f"Error al exportar la informacion de las entradas a excel: {str(e)}")
@@ -174,8 +187,14 @@ def export_excel_salidas():
         query_salidas = "select * from dbo.salidas;"
         with engine.begin() as cursor:
              df_i = pd.read_sql(query_salidas, cursor)
-             excel_file_sal = "salidas.xlsx"
-             df_i.to_excel(excel_file_sal, index=False)
+             file_path_sal = filedialog.asksaveasfilename(defaultextension='xlsx',
+                                                          filetypes=[("Ecel files", "*.xlsx")])
+             if file_path_sal == "":
+                 messagebox.showinfo("Informacion", "Informacion cancelada sin guadar!")
+                 return
+
+             df_i.to_excel(file_path_sal, index=False)
+             messagebox.showinfo("Exito", "Informacion exportada correctamente!")
 
     except Exception as e:
         messagebox.showerror("Error", f"Error al exportar la informacion de las salidas a excel: {str(e)}")

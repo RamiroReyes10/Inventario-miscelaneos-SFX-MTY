@@ -52,6 +52,17 @@ def show_salidas():
     boton_guardar_sal.place(x=230, y=150)
     boton_volver.place(x=300, y=150)
 
+def show_consultas():
+    for widget in ventana_princ.winfo_children():
+        widget.place_forget()
+
+    titulo_consultas.pack(anchor=tk.CENTER)
+    combo.place(x=200, y=35)
+    boton_cargar_consul.place(x=50, y=35)
+    entry.place(x=200, y=75)
+    boton_consultas.place(x=130, y=150)
+    boton_volver.place(x=300, y=150)
+
 
 def show_registros():
     for widget in ventana_princ.winfo_children():
@@ -81,6 +92,7 @@ def show_main():
         boton_salidas.place(x=175, y=140)
         boton_registros.place(x=290, y=140)
         boton_salir.place(x=395, y=140)
+        boton_consulta.place(x=50, y=80)
 
 def cargar_productos():
     try:
@@ -214,11 +226,14 @@ Label(ventana_princ, image=img, anchor="nw").pack()
 
 ventana_princ.iconbitmap("avion.ico")
 
+#Botones de interfaz principal
 boton_entradas = tk.Button(ventana_princ, text="Entradas", command=show_entradas)
 boton_salidas = tk.Button(ventana_princ, text="Salidas", command=show_salidas)
 boton_registros = tk.Button(ventana_princ, text="Registros", command=show_registros)
 boton_salir = tk.Button(ventana_princ, text="Salir", command=Salir_app)
+boton_consulta = tk.Button(ventana_princ, text="Consulta", command=show_consultas)
 
+#------------------------------------------------------------------------------------------------------
 titulo_entradas = tk.Label(ventana_princ, text="Entradas")
 boton_cargar = tk.Button(ventana_princ, text="Cargar informacion", command=cargar_productos)
 entry = tk.Entry(ventana_princ)
@@ -228,6 +243,10 @@ boton_volver = tk.Button(ventana_princ, text="Volver", command=show_main)
 titulo_salidas = tk.Label(ventana_princ, text="Salidas")
 boton_cargar_sal = tk.Button(ventana_princ, text="Cargar informacion", command=cargar_productos)
 boton_guardar_sal = tk.Button(ventana_princ, text="Guardar", command=guardar_salida)
+
+titulo_consultas = tk.Label(ventana_princ, text="Consulta")
+boton_cargar_consul = tk.Button(ventana_princ, text="Cargar informacion", command=cargar_productos)
+boton_consultas = tk.Button(ventana_princ, text="Consulta de stock")
 
 boton_reg_entradas = tk.Button(ventana_princ, text="Registro de entradas", command=export_excel_entradas)
 boton_reg_salidas = tk.Button(ventana_princ, text="Registro de Salidas", command=export_excel_salidas)

@@ -1,5 +1,5 @@
 import tkinter
-from tkinter import ANCHOR, CENTER, Label, ttk
+from tkinter import ANCHOR, CENTER, CURRENT, Label, ttk
 from tkinter import filedialog
 from tkinter.font import Font
 import pyodbc
@@ -56,12 +56,13 @@ def show_consultas():
     for widget in ventana_princ.winfo_children():
         widget.place_forget()
 
-    titulo_consultas.pack(anchor=tk.CENTER)
-    combo.place(x=200, y=35)
-    boton_cargar_consul.place(x=50, y=35)
-    entry.place(x=200, y=75)
-    boton_consultas.place(x=130, y=150)
+    boton_consultas.place(x=130, y=95)
     boton_volver.place(x=300, y=150)
+
+    titulo_consultas_reg = tk.Label(ventana_princ, text="Que registro deseas ver?")
+    titulo_consultas_reg.place(x=210, y=13)
+    titulo_consultas_reg.config(bg="white",
+                                font=("Arial Black",12))
 
 
 def show_registros():
@@ -78,6 +79,19 @@ def show_registros():
         titulo_reg.config(bg="white",
                           font=("Arial Black",12))
 
+def show_intransit_interfaz():
+    for widget in ventana_princ.winfo_children():
+        widget.place_forget()
+
+        boton_agregar_int.place(x=175, y=100)
+        boton_registo_int.place(x=260, y=100)
+        boton_volver.place(x=380, y=150)
+
+        titulo_intransit = tk.Label(ventana_princ, text="Que movimiento deseas realizar?")
+        titulo_intransit.place(x=75, y=10)
+        titulo_intransit.config(bg="white",
+                                font=("Arial Black",10))
+
 
 def show_main():
     for widget in ventana_princ.winfo_children():
@@ -93,6 +107,8 @@ def show_main():
         boton_registros.place(x=290, y=140)
         boton_salir.place(x=395, y=140)
         boton_consulta.place(x=50, y=80)
+        boton_intransit.place(x=175, y=80)
+
 
 def cargar_productos():
     try:
@@ -102,6 +118,18 @@ def cargar_productos():
     except Exception as e:
         print(f"Error al cargar productos: {e}")
         
+def show_intransit():
+    for widget in ventana_princ.winfo_children():
+        widget.place_forget()
+
+        combo.place(x=200, y=35)
+        boton_cargar_sal.place(x=50, y=35)
+        entry.place(x=200, y=75)
+        boton_guardar_ints.place(x=230, y=150)
+        boton_volver.place(x=300, y=150)
+
+
+
 #funcion para guardar stock entrada
 def guardar_entrada():
     #Recuperer el nombre del producto seleccionado en el combobox
@@ -158,6 +186,22 @@ def guardar_salida():
             print(f"Error: {e}")
     else:
         print("Por favor, selecciona un producto e ingresa una cantidad.")
+
+def guardar_intransit():
+    nombre_del_producto_ints = combo.get()
+    cantidad_ints = entry.get()
+
+    if nombre_del_producto_ints and cantidad_ints:
+        try:
+            cantidad_ints = int(cantidad_ints)
+            cursor.execute("Select stock FROM dbo.Inventarios where Nombre_del_producto = ?",(nombre_del_producto_ints))
+            stock_actual = cursor.fetchone()[0]
+            cursor.execute("INSERT INTO dbo.Intransit (nombre_del_producto, stock_actual, intransit, fecha) VALUES (?, ?, ?, GETDATE())",(nombre_del_producto_ints, stock_actual, cantidad_ints))
+            connection.commit()
+        except Exception as e:
+            print(f"Error: {e}")
+    else:
+        print("Por favor selecciona un producto e ingresa la cantidad")
 
 
 def export_excel_inventario():
@@ -232,6 +276,7 @@ boton_salidas = tk.Button(ventana_princ, text="Salidas", command=show_salidas)
 boton_registros = tk.Button(ventana_princ, text="Registros", command=show_registros)
 boton_salir = tk.Button(ventana_princ, text="Salir", command=Salir_app)
 boton_consulta = tk.Button(ventana_princ, text="Consulta", command=show_consultas)
+boton_intransit = tk.Button(ventana_princ, text="Intransit", command=show_intransit_interfaz)
 
 #------------------------------------------------------------------------------------------------------
 titulo_entradas = tk.Label(ventana_princ, text="Entradas")
@@ -240,12 +285,17 @@ entry = tk.Entry(ventana_princ)
 boton_guardar = tk.Button(ventana_princ, text="Guardar", command=guardar_entrada)
 boton_volver = tk.Button(ventana_princ, text="Volver", command=show_main)
 
+
 titulo_salidas = tk.Label(ventana_princ, text="Salidas")
 boton_cargar_sal = tk.Button(ventana_princ, text="Cargar informacion", command=cargar_productos)
 boton_guardar_sal = tk.Button(ventana_princ, text="Guardar", command=guardar_salida)
 
-titulo_consultas = tk.Label(ventana_princ, text="Consulta")
-boton_cargar_consul = tk.Button(ventana_princ, text="Cargar informacion", command=cargar_productos)
+boton_agregar_int = tk.Button(ventana_princ, text="Agregar", command=show_intransit)
+boton_registo_int = tk.Button(ventana_princ, text="Registros")
+
+boton_guardar_ints =tk.Button(ventana_princ, text="Guardar", command=guardar_intransit)
+
+titulo_consultas = tk.Label(ventana_princ, text="Consultas")
 boton_consultas = tk.Button(ventana_princ, text="Consulta de stock")
 
 boton_reg_entradas = tk.Button(ventana_princ, text="Registro de entradas", command=export_excel_entradas)

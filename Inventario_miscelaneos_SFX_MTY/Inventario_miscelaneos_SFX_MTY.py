@@ -157,9 +157,9 @@ def guardar_entrada():
             #este linea hace que se guarden los cambios en la base de datos
             connection.commit()
         except Exception as e:
-            print(f"Error: {e}")
+            messagebox.showerror(f"Error: {e}")
     else:
-        print("Por favor, selecciona un producto e ingresa una cantidad.")
+        messagebox.showerror("error", f"Por favor, selecciona un producto e ingresa una cantidad.")
 
 
 #funcion para guardar stock Salida
@@ -183,9 +183,9 @@ def guardar_salida():
 
             connection.commit()
         except Exception as e:
-            print(f"Error: {e}")
+            messagebox.showerror(f"Error: {e}")
     else:
-        print("Por favor, selecciona un producto e ingresa una cantidad.")
+        messagebox.showerror("error", f"Por favor, selecciona un producto e ingresa una cantidad.")
 
 def guardar_intransit():
     nombre_del_producto_ints = combo.get()
@@ -194,14 +194,15 @@ def guardar_intransit():
     if nombre_del_producto_ints and cantidad_ints:
         try:
             cantidad_ints = int(cantidad_ints)
+            cursor.execute("UPDATE dbo.Inventarios SET IT = IT + ? WHERE Nombre_del_producto = ?", (cantidad_ints, nombre_del_producto_ints))
             cursor.execute("Select stock FROM dbo.Inventarios where Nombre_del_producto = ?",(nombre_del_producto_ints))
             stock_actual = cursor.fetchone()[0]
             cursor.execute("INSERT INTO dbo.Intransit (nombre_del_producto, stock_actual, intransit, fecha) VALUES (?, ?, ?, GETDATE())",(nombre_del_producto_ints, stock_actual, cantidad_ints))
             connection.commit()
         except Exception as e:
-            print(f"Error: {e}")
+            messagebox.showerror(f"Error: {e}")
     else:
-        print("Por favor selecciona un producto e ingresa la cantidad")
+        messagebox.showerror("Error", f"Por favor seleccione un producto y una cantidad")
 
 
 def export_excel_inventario():
@@ -240,7 +241,7 @@ def export_excel_entradas():
 
 def export_excel_salidas():
     try:
-        query_salidas = "select * from dbo.salidas;"
+        query_salidas = "select * from dbo.salidas"
         with engine.begin() as cursor:
              df_i = pd.read_sql(query_salidas, cursor)
              file_path_sal = filedialog.asksaveasfilename(defaultextension='xlsx',
@@ -254,6 +255,24 @@ def export_excel_salidas():
 
     except Exception as e:
         messagebox.showerror("Error", f"Error al exportar la informacion de las salidas a excel: {str(e)}")
+
+def export_excel_intransit():
+    try:
+        query_intransit="select * from dbo.intransit"
+        with engine.begin() as cursor:
+             df_i = pd.read_sql(query_intransit, cursor)
+             file_path_intransit = filedialog.asksaveasfilename(defaultextension='xlsx',
+                                                           filetypes=[("Excel files", "*.xlsx")])
+             if file_path_intransit =="":
+                 messagebox.showinfo("Informacion", "Informacion cancelada sin guardar!")
+                 return
+
+             df_i.to_excel(file_path_intransit, index=False)
+             messagebox.showinfo("Exito", "Informacion guardada correctamente!")
+
+    except Exception as e:
+        messagebox.showerror("Error", f"Error al exportar la informacion a excel: {str(e)}")
+
 
 def Salir_app():
     ventana_princ.destroy()
@@ -291,7 +310,7 @@ boton_cargar_sal = tk.Button(ventana_princ, text="Cargar informacion", command=c
 boton_guardar_sal = tk.Button(ventana_princ, text="Guardar", command=guardar_salida)
 
 boton_agregar_int = tk.Button(ventana_princ, text="Agregar", command=show_intransit)
-boton_registo_int = tk.Button(ventana_princ, text="Registros")
+boton_registo_int = tk.Button(ventana_princ, text="Registros", command=export_excel_intransit)
 
 boton_guardar_ints =tk.Button(ventana_princ, text="Guardar", command=guardar_intransit)
 

@@ -28,7 +28,6 @@ try:
 except Exception as e:
     print(f"Error: {e}")
 
-
 def show_entradas():
     for widget in ventana_princ.winfo_children():
         widget.place_forget()
@@ -92,6 +91,30 @@ def show_intransit_interfaz():
         titulo_intransit.config(bg="white",
                                 font=("Arial Black",10))
 
+def show_consulta_accion():
+    for widget in ventana_princ.winfo_children():
+        widget.place_forget()
+
+    titulo_salidas.pack(anchor=tk.CENTER)
+    combo.place(x=200, y=35)
+    boton_selec_prod_accion.place(x=50, y=35)
+    stock_textbox.place(x=130, y=95)
+    accion_textbox.place(x=355, y=95)
+    boton_consultar_produc_accion.place(x=230, y=150)
+    boton_volver_consultas.place(x=330, y=150)
+
+    cantidad_prod = tk.Label(ventana_princ, text="Stock Actual")
+    cantidad_prod.place(x=30, y=95)
+    cantidad_prod.config(bg="white",
+                         font=("Arial Black",8))
+
+    estado_prod = tk.Label(ventana_princ, text="Status")
+    estado_prod.place(x=300, y=95)
+    estado_prod.config(bg="white",
+                         font=("Arial Black",8))
+
+
+
 
 def show_main():
     for widget in ventana_princ.winfo_children():
@@ -117,7 +140,8 @@ def cargar_productos():
         combo['values'] = tuple(datos)
     except Exception as e:
         print(f"Error al cargar productos: {e}")
-        
+
+
 def show_intransit():
     for widget in ventana_princ.winfo_children():
         widget.place_forget()
@@ -202,7 +226,23 @@ def guardar_intransit():
         except Exception as e:
             messagebox.showerror(f"Error: {e}")
     else:
-        messagebox.showerror("Error", f"Por favor seleccione un producto y una cantidad")
+        messagebox.showerror("Error", f"Por favor seleccione un producto y una cantidad") 
+
+def actualizacion_stock_consulta():
+    producto_seleccionado = combo.get()
+    cursor.execute("SELECT stock, Accion FROM dbo.inventarios WHERE Nombre_del_producto = ?", (producto_seleccionado,))
+    resultado = cursor.fetchone()
+    connection.commit()
+
+    if resultado:
+        stock_textbox.delete(0, tk.END) 
+        stock_textbox.insert(0, resultado[0])  
+
+        accion_textbox.delete(0, tk.END)  
+        accion_textbox.insert(0, resultado[1])  
+
+    else:
+        print("Producto no encontrado")
 
 
 def export_excel_inventario():
@@ -315,13 +355,23 @@ boton_registo_int = tk.Button(ventana_princ, text="Registros", command=export_ex
 boton_guardar_ints =tk.Button(ventana_princ, text="Guardar", command=guardar_intransit)
 
 titulo_consultas = tk.Label(ventana_princ, text="Consultas")
-boton_consultas = tk.Button(ventana_princ, text="Consulta de stock")
+boton_consultas = tk.Button(ventana_princ, text="Consulta de stock", command=show_consulta_accion)
+boton_selec_prod_accion = tk.Button(ventana_princ, text="consultar producto", command=cargar_productos)
+boton_consultar_produc_accion = tk.Button(ventana_princ, text="Consultar", command=actualizacion_stock_consulta)
+boton_volver_consultas = tk.Button(ventana_princ, text="volver", command=show_consultas)
+accion = tk.Entry(ventana_princ)
 
 boton_reg_entradas = tk.Button(ventana_princ, text="Registro de entradas", command=export_excel_entradas)
 boton_reg_salidas = tk.Button(ventana_princ, text="Registro de Salidas", command=export_excel_salidas)
 boton_inventario = tk.Button(ventana_princ, text="Inventario", command=export_excel_inventario)
 
-combo = ttk.Combobox(ventana_princ, font=Font(size=15))
+stock_textbox = tk.Entry(ventana_princ)
+stock_textbox.pack(pady=5)
+ 
+accion_textbox = tk.Entry(ventana_princ)
+accion_textbox.pack(pady=5)
+
+combo = ttk.Combobox(ventana_princ, state="readonly", font=Font(size=15))
 
 show_main()
 

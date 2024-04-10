@@ -28,6 +28,33 @@ try:
 except Exception as e:
     print(f"Error: {e}")
 
+
+def show_main():
+    for widget in ventana_princ.winfo_children():
+        widget.place_forget()
+
+        titulo = tk.Label(ventana_princ, text="Bienvenido al Sistema de Inventario Miscelaneos SFX MTY! \n Que movimiento desea hacer?")
+        titulo.place(x=50, y=4)
+        titulo.config(bg="white",
+                      font=("Arial Black",10))
+
+        boton_entradas.place(x=50, y=140)
+        boton_salidas.place(x=175, y=140)
+        boton_registros.place(x=290, y=140)
+        boton_salir.place(x=395, y=140)
+        boton_consulta.place(x=50, y=80)
+        boton_intransit.place(x=175, y=80)
+
+
+def cargar_productos():
+    try:
+        cursor.execute("SELECT [Nombre_del_producto] FROM dbo.Inventarios")
+        datos = [fila.Nombre_del_producto for fila in cursor.fetchall()]
+        combo['values'] = tuple(datos)
+    except Exception as e:
+        print(f"Error al cargar productos: {e}")
+
+
 def show_entradas():
     for widget in ventana_princ.winfo_children():
         widget.place_forget()
@@ -82,14 +109,36 @@ def show_intransit_interfaz():
     for widget in ventana_princ.winfo_children():
         widget.place_forget()
 
-        boton_agregar_int.place(x=175, y=100)
-        boton_registo_int.place(x=260, y=100)
-        boton_volver.place(x=380, y=150)
+        boton_agregar_int.place(x=50, y=100)
+        boton_registo_int.place(x=350, y=100)
+        boton_recibo_material.place(x=200, y=100)
+        boton_volver.place(x=390, y=153)
 
-        titulo_intransit = tk.Label(ventana_princ, text="Que movimiento deseas realizar?")
+        titulo_intransit = tk.Label(ventana_princ, text="Que movimiento deseas realizar en Intransit?")
         titulo_intransit.place(x=75, y=10)
         titulo_intransit.config(bg="white",
                                 font=("Arial Black",10))
+
+
+def show_agregar_instransit():
+    for widget in ventana_princ.winfo_children():
+        widget.place_forget()
+
+        combo.place(x=200, y=35)
+        boton_cargar_sal.place(x=50, y=35)
+        entry.place(x=200, y=75)
+        boton_guardar_ints.place(x=230, y=150)
+        boton_volver_main_int.place(x=300, y=150)
+
+def show_recibo_material_intransit():
+    for widget in ventana_princ.winfo_children():
+        widget.place_forget()
+
+        combo.place(x=200, y=35)
+        boton_cargar_sal.place(x=50, y=35)
+        entry.place(x=200, y=75)
+        boton_guardar_recibo_material.place(x=300, y=150)
+        boton_volver_main_int.place(x=390, y=150)
 
 def show_consulta_accion():
     for widget in ventana_princ.winfo_children():
@@ -112,46 +161,6 @@ def show_consulta_accion():
     estado_prod.place(x=300, y=95)
     estado_prod.config(bg="white",
                          font=("Arial Black",8))
-
-
-
-
-def show_main():
-    for widget in ventana_princ.winfo_children():
-        widget.place_forget()
-
-        titulo = tk.Label(ventana_princ, text="Bienvenido al Sistema de Inventario Miscelaneos SFX MTY! \n Que movimiento desea hacer?")
-        titulo.place(x=50, y=4)
-        titulo.config(bg="white",
-                      font=("Arial Black",10))
-
-        boton_entradas.place(x=50, y=140)
-        boton_salidas.place(x=175, y=140)
-        boton_registros.place(x=290, y=140)
-        boton_salir.place(x=395, y=140)
-        boton_consulta.place(x=50, y=80)
-        boton_intransit.place(x=175, y=80)
-
-
-def cargar_productos():
-    try:
-        cursor.execute("SELECT [Nombre_del_producto] FROM dbo.Inventarios")
-        datos = [fila.Nombre_del_producto for fila in cursor.fetchall()]
-        combo['values'] = tuple(datos)
-    except Exception as e:
-        print(f"Error al cargar productos: {e}")
-
-
-def show_intransit():
-    for widget in ventana_princ.winfo_children():
-        widget.place_forget()
-
-        combo.place(x=200, y=35)
-        boton_cargar_sal.place(x=50, y=35)
-        entry.place(x=200, y=75)
-        boton_guardar_ints.place(x=230, y=150)
-        boton_volver.place(x=300, y=150)
-
 
 
 #funcion para guardar stock entrada
@@ -218,7 +227,7 @@ def guardar_intransit():
     if nombre_del_producto_ints and cantidad_ints:
         try:
             cantidad_ints = int(cantidad_ints)
-            cursor.execute("UPDATE dbo.Inventarios SET IT = IT + ? WHERE Nombre_del_producto = ?", (cantidad_ints, nombre_del_producto_ints))
+            cursor.execute("UPDATE dbo.Inventarios SET intran = ISNULL(intran,0) + ? WHERE Nombre_del_producto = ?", (cantidad_ints, nombre_del_producto_ints))
             cursor.execute("Select stock FROM dbo.Inventarios where Nombre_del_producto = ?",(nombre_del_producto_ints))
             stock_actual = cursor.fetchone()[0]
             cursor.execute("INSERT INTO dbo.Intransit (nombre_del_producto, stock_actual, intransit, fecha) VALUES (?, ?, ?, GETDATE())",(nombre_del_producto_ints, stock_actual, cantidad_ints))
@@ -226,7 +235,25 @@ def guardar_intransit():
         except Exception as e:
             messagebox.showerror(f"Error: {e}")
     else:
-        messagebox.showerror("Error", f"Por favor seleccione un producto y una cantidad") 
+        messagebox.showerror("error", f"Por favor seleccione un producto y una cantidad.") 
+
+
+def recibir_material_instransit():
+    nombre_de_producto_inst_rm = combo.get()
+    cantidad_ints_rm = entry.get()
+
+    if nombre_de_producto_inst_rm and cantidad_ints_rm:
+        try:
+            cantidad_ints_rm = int(cantidad_ints_rm)
+            cursor.execute("UPDATE dbo.Inventarios SET intran = intran - ? WHERE Nombre_del_producto = ?", (cantidad_ints_rm, nombre_de_producto_inst_rm))
+            cursor.execute("Select stock FROM dbo.Inventarios where Nombre_del_producto = ?",(nombre_de_producto_inst_rm))
+            stock_actual = cursor.fetchone()[0]
+            cursor.execute("INSERT INTO dbo.Intransit (nombre_del_producto, stock_actual, recibo_de_material, fecha) VALUES (?, ?, ?, GETDATE())",(nombre_de_producto_inst_rm, stock_actual, cantidad_ints_rm))
+            connection.commit()
+        except Exception as e:
+            messagebox.showerror(f"Error: {e}")
+    else:
+        messagebox.showerror("error", f"Por favor seleccione un producto y una cantidad")
 
 def actualizacion_stock_consulta():
     producto_seleccionado = combo.get()
@@ -337,7 +364,7 @@ boton_salir = tk.Button(ventana_princ, text="Salir", command=Salir_app)
 boton_consulta = tk.Button(ventana_princ, text="Consulta", command=show_consultas)
 boton_intransit = tk.Button(ventana_princ, text="Intransit", command=show_intransit_interfaz)
 
-#------------------------------------------------------------------------------------------------------
+#Botones, combobox titulos y mas
 titulo_entradas = tk.Label(ventana_princ, text="Entradas")
 boton_cargar = tk.Button(ventana_princ, text="Cargar informacion", command=cargar_productos)
 entry = tk.Entry(ventana_princ)
@@ -349,10 +376,13 @@ titulo_salidas = tk.Label(ventana_princ, text="Salidas")
 boton_cargar_sal = tk.Button(ventana_princ, text="Cargar informacion", command=cargar_productos)
 boton_guardar_sal = tk.Button(ventana_princ, text="Guardar", command=guardar_salida)
 
-boton_agregar_int = tk.Button(ventana_princ, text="Agregar", command=show_intransit)
+boton_agregar_int = tk.Button(ventana_princ, text="Agregar a intransit", command=show_agregar_instransit)
 boton_registo_int = tk.Button(ventana_princ, text="Registros", command=export_excel_intransit)
+boton_recibo_material = tk.Button(ventana_princ, text="Recibo de material", command=show_recibo_material_intransit)
+boton_guardar_recibo_material = tk.Button(ventana_princ, text="guardar", command=recibir_material_instransit)
 
 boton_guardar_ints =tk.Button(ventana_princ, text="Guardar", command=guardar_intransit)
+boton_volver_main_int =tk.Button(ventana_princ, text="volver", command=show_intransit_interfaz)
 
 titulo_consultas = tk.Label(ventana_princ, text="Consultas")
 boton_consultas = tk.Button(ventana_princ, text="Consulta de stock", command=show_consulta_accion)
@@ -360,6 +390,7 @@ boton_selec_prod_accion = tk.Button(ventana_princ, text="consultar producto", co
 boton_consultar_produc_accion = tk.Button(ventana_princ, text="Consultar", command=actualizacion_stock_consulta)
 boton_volver_consultas = tk.Button(ventana_princ, text="volver", command=show_consultas)
 accion = tk.Entry(ventana_princ)
+
 
 boton_reg_entradas = tk.Button(ventana_princ, text="Registro de entradas", command=export_excel_entradas)
 boton_reg_salidas = tk.Button(ventana_princ, text="Registro de Salidas", command=export_excel_salidas)

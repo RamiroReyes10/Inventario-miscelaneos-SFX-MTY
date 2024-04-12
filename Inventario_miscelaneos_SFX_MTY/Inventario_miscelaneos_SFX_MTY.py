@@ -125,6 +125,9 @@ def show_agregar_instransit():
     for widget in ventana_princ.winfo_children():
         widget.place_forget()
 
+        combo.set("")
+        entry.delete(0, "end")
+
         combo.place(x=200, y=35)
         boton_cargar_sal.place(x=50, y=35)
         entry.place(x=200, y=75)
@@ -188,25 +191,28 @@ def guardar_entrada():
         try:
             #convertir la cantidad a int
             cantidad = int(cantidad)
-            
-            #Actuaizar el Stock de la tabla inventarios
+     
             cursor.execute("UPDATE dbo.Inventarios SET stock = stock + ? WHERE Nombre_del_producto = ?", (cantidad, nombre_del_producto))
+           
+            cursor.execute("SELECT stock, Punto_Reorden FROM dbo.Inventarios WHERE Nombre_del_producto = ?",(nombre_del_producto))
+            resultado_ent = cursor.fetchone()
+            if resultado_ent:
+                stock_actual, punto_de_reorden = resultado_ent
             
-            #Obtener el sotck actualizado del producto
-            cursor.execute("SELECT stock FROM dbo.Inventarios WHERE Nombre_del_producto = ?",(nombre_del_producto))
-            stock_actual = cursor.fetchone()[0]
-            
-            #Ejecutar la consulta de SQL con los valores obtenidos
-            cursor.execute("INSERT INTO dbo.Entradas (nombre_del_producto, stock_actual, entrada, fecha) VALUES (?, ?, ?, GETDATE())",(nombre_del_producto, stock_actual, cantidad,))
+                cursor.execute("INSERT INTO dbo.Entradas (nombre_del_producto, stock_actual, entrada, fecha) VALUES (?, ?, ?, GETDATE())",(nombre_del_producto, stock_actual, cantidad,))
 
-            #este linea hace que se guarden los cambios en la base de datos
-            connection.commit()
-            messagebox.showinfo("Exito", "Entrada guardada correctamente")
+                if stock_actual > punto_de_reorden:
+                    cursor.execute("UPDATE dbo.Inventarios SET Accion = 'Cantidad Suficiente' WHERE Nombre_del_producto = ?", (nombre_del_producto))
+                    connection.commit()
+
+                    messagebox.showinfo("Exito", "Entrada guardada correctamente")
+                else:
+                    messagebox.showerror("Error", "Producto no encontradp en el inventario")
+
         except Exception as e:
             messagebox.showerror(f"Error: {e}")
     else:
         messagebox.showerror("error", f"Por favor, selecciona un producto e ingresa una cantidad.")
-
 
 #funcion para guardar stock Salida
 def guardar_salida():
@@ -230,9 +236,9 @@ def guardar_salida():
                     cursor.execute("UPDATE dbo.Inventarios SET Accion = 'Comprar' WHERE Nombre_del_Producto = ?", (nombre_del_producto_sal,))
                     connection.commit()
     
-                messagebox.showinfo("Exito", "Salida guardada correctamente")
-            else:
-                messagebox.showerror("Error", "Producto no encontrado en el inventario.")
+                    messagebox.showinfo("Exito", "Salida guardada correctamente")
+                else:
+                    messagebox.showerror("Error", "Producto no encontrado en el inventario.")
         except Exception as e:
             messagebox.showerror("Error", f"Error: {e}")
     else:

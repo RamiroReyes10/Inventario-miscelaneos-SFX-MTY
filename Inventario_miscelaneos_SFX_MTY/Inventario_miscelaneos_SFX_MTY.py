@@ -30,20 +30,24 @@ except Exception as e:
 
 
 def show_main():
-    for widget in ventana_princ.winfo_children():
-        widget.place_forget()
+    clear_window()    
 
-        titulo = tk.Label(ventana_princ, text="Bienvenido al Sistema de Inventario Miscelaneos SFX MTY! \n Que movimiento desea hacer?")
-        titulo.place(x=50, y=4)
-        titulo.config(bg="white",
+    titulo = tk.Label(ventana_princ, text="Bienvenido al Sistema de Inventario Miscelaneos SFX MTY! \n Que movimiento desea hacer?")
+    titulo.place(x=50, y=4)
+    titulo.config(bg="white",
                       font=("Arial Black",10))
 
-        boton_entradas.place(x=50, y=140)
-        boton_salidas.place(x=175, y=140)
-        boton_registros.place(x=290, y=140)
-        boton_salir.place(x=395, y=140)
-        boton_consulta.place(x=50, y=80)
-        boton_intransit.place(x=175, y=80)
+    boton_entradas.place(x=50, y=140)
+    boton_salidas.place(x=175, y=140)
+    boton_registros.place(x=290, y=140)
+    boton_salir.place(x=395, y=140)
+    boton_consulta.place(x=50, y=80)
+    boton_intransit.place(x=175, y=80)
+    
+def clear_window():
+    for widget in ventana_princ.winfo_children():
+        widget.place_forget()
+        
 
 
 def cargar_productos():
@@ -56,8 +60,7 @@ def cargar_productos():
 
 
 def show_entradas():
-    for widget in ventana_princ.winfo_children():
-        widget.place_forget()
+    clear_window()
 
     titulo_entradas.pack(anchor=tk.CENTER)
     combo.place(x=200, y =35)
@@ -68,8 +71,7 @@ def show_entradas():
 
 
 def show_salidas():
-    for widget in ventana_princ.winfo_children():
-        widget.place_forget()
+    clear_window()
 
     titulo_salidas.pack(anchor=tk.CENTER)
     combo.place(x=200, y=35)
@@ -79,8 +81,7 @@ def show_salidas():
     boton_volver.place(x=300, y=150)
 
 def show_consultas():
-    for widget in ventana_princ.winfo_children():
-        widget.place_forget()
+    clear_window()
 
     boton_consultas.place(x=110, y=95)
     boton_consuta_int.place(x=285, y=95)
@@ -93,60 +94,55 @@ def show_consultas():
 
 
 def show_registros():
-    for widget in ventana_princ.winfo_children():
-        widget.place_forget()
+    clear_window()
 
-        boton_reg_entradas.place(x=40, y =40)
-        boton_reg_salidas.place(x=40, y=85)
-        boton_inventario.place(x=40, y=135)
-        boton_volver.place(x=380, y=150)
+    boton_reg_entradas.place(x=40, y =40)
+    boton_reg_salidas.place(x=40, y=85)
+    boton_inventario.place(x=40, y=135)
+    boton_volver.place(x=380, y=150)
 
-        titulo_reg = tk.Label(ventana_princ, text="Que informacion deseas ver?")
-        titulo_reg.place(x=210, y=13)
-        titulo_reg.config(bg="white",
+    titulo_reg = tk.Label(ventana_princ, text="Que informacion deseas ver?")
+    titulo_reg.place(x=210, y=13)
+    titulo_reg.config(bg="white",
                           font=("Arial Black",12))
 
 def show_intransit_interfaz():
-    for widget in ventana_princ.winfo_children():
-        widget.place_forget()
+    clear_window()
 
-        boton_agregar_int.place(x=50, y=100)
-        boton_registo_int.place(x=350, y=100)
-        boton_recibo_material.place(x=200, y=100)
-        boton_volver.place(x=390, y=153)
+    boton_agregar_int.place(x=50, y=100)
+    boton_registo_int.place(x=350, y=100)
+    boton_recibo_material.place(x=200, y=100)
+    boton_volver.place(x=390, y=153)
 
-        titulo_intransit = tk.Label(ventana_princ, text="Que movimiento deseas realizar en Intransit?")
-        titulo_intransit.place(x=75, y=10)
-        titulo_intransit.config(bg="white",
+    titulo_intransit = tk.Label(ventana_princ, text="Que movimiento deseas realizar en Intransit?")
+    titulo_intransit.place(x=75, y=10)
+    titulo_intransit.config(bg="white",
                                 font=("Arial Black",10))
 
 
 def show_agregar_instransit():
-    for widget in ventana_princ.winfo_children():
-        widget.place_forget()
+    clear_window()
 
-        combo.set("")
-        entry.delete(0, "end")
+    combo.set("")
+    entry.delete(0, "end")
 
-        combo.place(x=200, y=35)
-        boton_cargar_sal.place(x=50, y=35)
-        entry.place(x=200, y=75)
-        boton_guardar_ints.place(x=230, y=150)
-        boton_volver_main_int.place(x=300, y=150)
+    combo.place(x=200, y=35)
+    boton_cargar_sal.place(x=50, y=35)
+    entry.place(x=200, y=75)
+    boton_guardar_ints.place(x=230, y=150)
+    boton_volver_main_int.place(x=300, y=150)
 
 def show_recibo_material_intransit():
-    for widget in ventana_princ.winfo_children():
-        widget.place_forget()
+    clear_window()
 
-        combo.place(x=200, y=35)
-        boton_cargar_sal.place(x=50, y=35)
-        entry.place(x=200, y=75)
-        boton_guardar_recibo_material.place(x=300, y=150)
-        boton_volver_main_int.place(x=390, y=150)
+    combo.place(x=200, y=35)
+    boton_cargar_sal.place(x=50, y=35)
+    entry.place(x=200, y=75)
+    boton_guardar_recibo_material.place(x=300, y=150)
+    boton_volver_main_int.place(x=390, y=150)
 
 def show_consulta_accion():
-    for widget in ventana_princ.winfo_children():
-        widget.place_forget()
+    clear_window()
 
     titulo_salidas.pack(anchor=tk.CENTER)
     combo.place(x=200, y=35)
@@ -167,14 +163,13 @@ def show_consulta_accion():
                          font=("Arial Black",8))
 
 def show_consulta_de_intransit():
-    for widget in ventana_princ.winfo_children():
-        widget.place_forget()
+    clear_window()
 
-        combo.place(x=200, y=35)
-        boton_selec_prod_in_int.place(x=50, y=35)
-        stock_int.place(x=200, y=95)
-        boton_consultar_in_intransit.place(x=250, y=150)
-        boton_volver_consultas.place(x=360, y=150)
+    combo.place(x=200, y=35)
+    boton_selec_prod_in_int.place(x=50, y=35)
+    stock_int.place(x=200, y=95)
+    boton_consultar_in_intransit.place(x=250, y=150)
+    boton_volver_consultas.place(x=360, y=150)
 
 
 

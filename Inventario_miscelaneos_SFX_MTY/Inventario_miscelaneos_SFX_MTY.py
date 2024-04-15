@@ -7,6 +7,7 @@ import tkinter as tk
 import pandas as pd
 from tkinter import messagebox
 from PIL import Image, ImageTk
+import datetime
 
 Server = "SFX02EU8JX4HK3"
 Database = "miscelaneos_db "
@@ -37,10 +38,15 @@ def show_main():
     titulo.config(bg="white",
                       font=("Arial Black",10))
 
+    footer_version = tk.Label(ventana_princ, text= "Version 1.0 \nBETA-DEMO")
+    footer_version.place(x=415, y=160)
+    footer_version.config(bg="white",
+                          font=("MS Sans Serif", 8))
+
     boton_entradas.place(x=50, y=140)
     boton_salidas.place(x=175, y=140)
-    boton_registros.place(x=290, y=140)
-    boton_salir.place(x=395, y=140)
+    boton_registros.place(x=290, y=80)
+    boton_salir.place(x=395, y=80)
     boton_consulta.place(x=50, y=80)
     boton_intransit.place(x=175, y=80)
     
@@ -109,9 +115,9 @@ def show_registros():
 def show_intransit_interfaz():
     clear_window()
 
-    boton_agregar_int.place(x=50, y=100)
-    boton_registo_int.place(x=350, y=100)
-    boton_recibo_material.place(x=200, y=100)
+    boton_agregar_int.place(x=150, y=100)
+    boton_registo_int.place(x=280, y=100)
+    #boton_recibo_material.place(x=200, y=100)
     boton_volver.place(x=390, y=153)
 
     titulo_intransit = tk.Label(ventana_princ, text="Que movimiento deseas realizar en Intransit?")
@@ -132,6 +138,7 @@ def show_agregar_instransit():
     boton_guardar_ints.place(x=230, y=150)
     boton_volver_main_int.place(x=300, y=150)
 
+"""
 def show_recibo_material_intransit():
     clear_window()
 
@@ -140,7 +147,7 @@ def show_recibo_material_intransit():
     entry.place(x=200, y=75)
     boton_guardar_recibo_material.place(x=300, y=150)
     boton_volver_main_int.place(x=390, y=150)
-
+"""
 def show_consulta_accion():
     clear_window()
 
@@ -187,7 +194,7 @@ def guardar_entrada():
             #convertir la cantidad a int
             cantidad = int(cantidad)
      
-            cursor.execute("UPDATE dbo.Inventarios SET stock = stock + ? WHERE Nombre_del_producto = ?", (cantidad, nombre_del_producto))
+            cursor.execute("UPDATE dbo.Inventarios SET stock = stock + ?, intran = intran - ? WHERE Nombre_del_producto = ?", (cantidad, cantidad, nombre_del_producto))
            
             cursor.execute("SELECT stock, Punto_Reorden FROM dbo.Inventarios WHERE Nombre_del_producto = ?",(nombre_del_producto))
             resultado_ent = cursor.fetchone()
@@ -259,7 +266,7 @@ def guardar_intransit():
     else:
         messagebox.showerror("error", f"Por favor seleccione un producto y una cantidad.") 
 
-
+"""
 def recibir_material_instransit():
     nombre_de_producto_inst_rm = combo.get()
     cantidad_ints_rm = entry.get()
@@ -279,7 +286,7 @@ def recibir_material_instransit():
             messagebox.showerror(f"Error: {e}")
     else:
         messagebox.showerror("error", f"Por favor seleccione un producto y una cantidad")
-
+"""
 def actualizacion_stock_consulta():
     producto_seleccionado = combo.get()
     cursor.execute("SELECT stock, Accion FROM dbo.inventarios WHERE Nombre_del_producto = ?", (producto_seleccionado,))
@@ -301,20 +308,22 @@ def actualizacion_intransit_consulta():
     resultado = cursor.fetchone()
     connection.commit()
 
-    if resultado:
+    if resultado is not None:
+        intransit = resultado[0] if resultado[0] is not None else 0
         stock_int.delete(0, tk.END)
-        stock_int.insert(0, resultado[0])
-
+        stock_int.insert(0, intransit)
     else:
         messagebox.showerror("Error", f"Producto no encontrado")
 
 
 def export_excel_inventario():
+    fecha_actual_inv = datetime.datetime.now().strftime("%Y-%m-%d")
+    name_file_inv = "Registros_Inventario_" + fecha_actual_inv
     try:
         query_inventario = "select * from dbo.inventarios"
         with engine.begin() as cursor:
              df_i = pd.read_sql(query_inventario, cursor)
-             file_path_inv = filedialog.asksaveasfilename(defaultextension='xlsx',
+             file_path_inv = filedialog.asksaveasfilename(initialfile = name_file_inv, defaultextension='xlsx',
                                                           filetypes=[("Excel files", "*.xlsx")])
              if file_path_inv == "":
                 messagebox.showinfo("Informacion", "Informacion Cancelada sin guardar!")
@@ -327,11 +336,13 @@ def export_excel_inventario():
         messagebox.showerror("Error", f"Error al exportar la informacion del inventario a excel: {str(e)}")
 
 def export_excel_entradas():
+    fecha_actual_ent = datetime.datetime.now().strftime("%Y-%m-%d")
+    name_file_ent = "Registro_Entadas_" + fecha_actual_ent
     try:
         query_entradas = "select * from dbo.entradas;"
         with engine.begin() as cursor:
              df_i = pd.read_sql(query_entradas, cursor)
-             file_path_ent = filedialog.asksaveasfilename(defaultextension='xlsx',
+             file_path_ent = filedialog.asksaveasfilename(initialfile = name_file_ent, defaultextension='xlsx',
                                                           filetypes=[("Excel files", "*.xlsx")])
              if  file_path_ent == "":
                  messagebox.showinfo("Informacion", "Informacion Cancelada sin guardar!")
@@ -344,11 +355,13 @@ def export_excel_entradas():
         messagebox.showerror("Error", f"Error al exportar la informacion de las entradas a excel: {str(e)}")
 
 def export_excel_salidas():
+    fecha_actual_sal = datetime.datetime.now().strftime("%Y-%m-%d")
+    name_file_sal = "Registro_Salidas_" + fecha_actual_sal 
     try:
         query_salidas = "select * from dbo.salidas"
         with engine.begin() as cursor:
              df_i = pd.read_sql(query_salidas, cursor)
-             file_path_sal = filedialog.asksaveasfilename(defaultextension='xlsx',
+             file_path_sal = filedialog.asksaveasfilename(initialfile = name_file_sal, defaultextension='xlsx',
                                                           filetypes=[("Ecel files", "*.xlsx")])
              if file_path_sal == "":
                  messagebox.showinfo("Informacion", "Informacion cancelada sin guadar!")
@@ -361,11 +374,13 @@ def export_excel_salidas():
         messagebox.showerror("Error", f"Error al exportar la informacion de las salidas a excel: {str(e)}")
 
 def export_excel_intransit():
+    fecha_actual_int = datetime.datetime.now().strftime("%Y-%m-%d")
+    name_file_intr = "Registro_Intransit" + fecha_actual_int
     try:
         query_intransit="select * from dbo.intransit"
         with engine.begin() as cursor:
              df_i = pd.read_sql(query_intransit, cursor)
-             file_path_intransit = filedialog.asksaveasfilename(defaultextension='xlsx',
+             file_path_intransit = filedialog.asksaveasfilename(initialfile=name_file_intr, defaultextension='xlsx',
                                                            filetypes=[("Excel files", "*.xlsx")])
              if file_path_intransit =="":
                  messagebox.showinfo("Informacion", "Informacion cancelada sin guardar!")
@@ -377,7 +392,17 @@ def export_excel_intransit():
     except Exception as e:
         messagebox.showerror("Error", f"Error al exportar la informacion a excel: {str(e)}")
 
+def limpiar_campos():
+    combo.set("")
+    stock_textbox.delete(0, "end")
+    accion_textbox.delete(0, "end")
+    stock_int.delete(0, "end")
 
+def limpiar_campos_entradas_salidas():
+    combo.set("")
+    entry.delete(0, "end")
+    combo["values"] =[]
+  
 def Salir_app():
     ventana_princ.destroy()
 
@@ -406,7 +431,7 @@ titulo_entradas = tk.Label(ventana_princ, text="Entradas")
 boton_cargar = tk.Button(ventana_princ, text="Cargar informacion", command=cargar_productos)
 entry = tk.Entry(ventana_princ)
 boton_guardar = tk.Button(ventana_princ, text="Guardar", command=guardar_entrada)
-boton_volver = tk.Button(ventana_princ, text="Volver", command=show_main)
+boton_volver = tk.Button(ventana_princ, text="Volver", command=lambda: (limpiar_campos_entradas_salidas(), show_main()))
 
 
 titulo_salidas = tk.Label(ventana_princ, text="Salidas")
@@ -415,8 +440,8 @@ boton_guardar_sal = tk.Button(ventana_princ, text="Guardar", command=guardar_sal
 
 boton_agregar_int = tk.Button(ventana_princ, text="Agregar a intransit", command=show_agregar_instransit)
 boton_registo_int = tk.Button(ventana_princ, text="Registros", command=export_excel_intransit)
-boton_recibo_material = tk.Button(ventana_princ, text="Recibo de material", command=show_recibo_material_intransit)
-boton_guardar_recibo_material = tk.Button(ventana_princ, text="guardar", command=recibir_material_instransit)
+#boton_recibo_material = tk.Button(ventana_princ, text="Recibo de material")
+#boton_guardar_recibo_material = tk.Button(ventana_princ, text="guardar")
 
 boton_selec_prod_in_int = tk.Button(ventana_princ, text="Cargar informacion", command=cargar_productos)
 boton_consultar_in_intransit = tk.Button(ventana_princ, text="Consultar", command=actualizacion_intransit_consulta)
@@ -429,7 +454,7 @@ boton_consultas = tk.Button(ventana_princ, text="Consulta de stock", command=sho
 boton_consuta_int = tk.Button(ventana_princ, text="Consulta de Intrasit", command=show_consulta_de_intransit)
 boton_selec_prod_accion = tk.Button(ventana_princ, text="consultar producto", command=cargar_productos)
 boton_consultar_produc_accion = tk.Button(ventana_princ, text="Consultar", command=actualizacion_stock_consulta)
-boton_volver_consultas = tk.Button(ventana_princ, text="volver", command=show_consultas)
+boton_volver_consultas = tk.Button(ventana_princ, text="volver", command=lambda: (limpiar_campos(), show_consultas()))
 accion = tk.Entry(ventana_princ)
 
 boton_reg_entradas = tk.Button(ventana_princ, text="Registro de entradas", command=export_excel_entradas)

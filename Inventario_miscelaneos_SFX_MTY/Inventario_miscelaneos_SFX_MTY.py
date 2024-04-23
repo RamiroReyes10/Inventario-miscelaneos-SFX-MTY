@@ -1,11 +1,12 @@
-import tkinter
 from tkinter import ANCHOR, CENTER, CURRENT, LEFT, Label, ttk
 from tkinter import filedialog
 from tkinter.font import Font
+from turtle import window_height, window_width
 import pyodbc
 import tkinter as tk
 import pandas as pd
 from tkinter import messagebox
+import os
 from PIL import Image, ImageTk
 import datetime
 
@@ -49,10 +50,14 @@ def show_main():
     boton_salir.place(x=395, y=80)
     boton_consulta.place(x=50, y=80)
     boton_intransit.place(x=175, y=80)
+    boton_materiales.place(x=290, y=140)
     
 def clear_window():
     for widget in ventana_princ.winfo_children():
         widget.place_forget()
+
+def tamano_ventana_uno():
+     ventana_princ.geometry("1210x600")
         
 
 
@@ -178,6 +183,24 @@ def show_consulta_de_intransit():
     boton_consultar_in_intransit.place(x=250, y=150)
     boton_volver_consultas.place(x=360, y=150)
 
+def materiales_alta_baja_delete():
+    clear_window()
+
+    boton_alta_producto.place(x=100, y=90)
+    boton_actualizar_producto.place(x=220, y=90)
+    boton_baja_producto.place(x=340, y=90)
+   
+
+def baja_materiales():
+    clear_window()
+
+
+
+def alta_materiales():
+    clear_window()
+
+def update_materiales():
+    clear_window()
 
 
 #funcion para guardar stock entrada
@@ -194,9 +217,9 @@ def guardar_entrada():
             #convertir la cantidad a int
             cantidad = int(cantidad)
      
-            cursor.execute("UPDATE dbo.Inventarios SET stock = stock + ?, intran = intran - ? WHERE Nombre_del_producto = ?", (cantidad, cantidad, nombre_del_producto))
+            cursor.execute("UPDATE dbo.Inventarios SET stock = stock + ? WHERE Nombre_del_producto = ?", (cantidad, cantidad, nombre_del_producto))
            
-            cursor.execute("SELECT stock, Punto_Reorden FROM dbo.Inventarios WHERE Nombre_del_producto = ?",(nombre_del_producto))
+            cursor.execute("SELECT stock, Punto_Reorden FROM dbo.Inventarios WHERE Nombre_del_producto = ?", (nombre_del_producto,))
             resultado_ent = cursor.fetchone()
             if resultado_ent:
                 stock_actual, punto_de_reorden = resultado_ent
@@ -204,12 +227,12 @@ def guardar_entrada():
                 cursor.execute("INSERT INTO dbo.Entradas (nombre_del_producto, stock_actual, entrada, fecha) VALUES (?, ?, ?, GETDATE())",(nombre_del_producto, stock_actual, cantidad,))
 
                 if stock_actual > punto_de_reorden:
-                    cursor.execute("UPDATE dbo.Inventarios SET Accion = 'Cantidad Suficiente' WHERE Nombre_del_producto = ?", (nombre_del_producto))
+                    cursor.execute("UPDATE dbo.Inventarios SET Accion = 'Cantidad Suficiente' WHERE Nombre_del_producto = ?", (nombre_del_producto,))
                     connection.commit()
 
                     messagebox.showinfo("Exito", "Entrada guardada correctamente")
                 else:
-                    messagebox.showerror("Error", "Producto no encontradp en el inventario")
+                    messagebox.showerror("Error", "Producto no encontrado en el inventario")
 
         except Exception as e:
             messagebox.showerror(f"Error: {e}")
@@ -226,23 +249,23 @@ def guardar_salida():
             cantidad_sal = int(cantidad_sal)
             
             cursor.execute("UPDATE dbo.Inventarios SET stock = stock - ? WHERE Nombre_del_producto = ?", (cantidad_sal, nombre_del_producto_sal))
+            cursor.execute("SELECT stock, Punto_Reorden FROM dbo.Inventarios WHERE Nombre_del_producto = ?", (nombre_del_producto_sal,))
+            resultado = cursor.fetchone()
             
-            cursor.execute("SELECT stock, Punto_Reorden FROM dbo.Inventarios WHERE Nombre_del_producto = ?",(nombre_del_producto_sal,))
-            resultado = cursor.fetchone()  
-            if resultado:  
+            if resultado:
                 stock_actual, punto_de_reorden = resultado
+                cursor.execute("INSERT INTO dbo.Salidas (nombre_del_producto, stock_actual, salida, fecha) VALUES (?, ?, ?, GETDATE())", (nombre_del_producto_sal, stock_actual, cantidad_sal,))
                 
-                cursor.execute("INSERT INTO dbo.Salidas (nombre_del_producto, stock_actual, salida, fecha) VALUES (?, ?, ?, GETDATE())",(nombre_del_producto_sal, stock_actual, cantidad_sal,))
-    
                 if stock_actual < punto_de_reorden:
                     cursor.execute("UPDATE dbo.Inventarios SET Accion = 'Comprar' WHERE Nombre_del_Producto = ?", (nombre_del_producto_sal,))
                     connection.commit()
-    
                     messagebox.showinfo("Exito", "Salida guardada correctamente")
                 else:
                     messagebox.showerror("Error", "Producto no encontrado en el inventario.")
+                    
         except Exception as e:
             messagebox.showerror("Error", f"Error: {e}")
+            
     else:
         messagebox.showerror("Error", "Por favor, selecciona un producto e ingresa una cantidad.")
 
@@ -401,7 +424,6 @@ def limpiar_campos():
 def limpiar_campos_entradas_salidas():
     combo.set("")
     entry.delete(0, "end")
-    combo["values"] =[]
   
 def Salir_app():
     ventana_princ.destroy()
@@ -413,10 +435,10 @@ ventana_princ.title("Inventario Miscelaneos SFX MTY")
 ventana_princ.geometry("500x200")
 ventana_princ.resizable(width=False, height=False)
 
-img = ImageTk.PhotoImage(Image.open("capy.jpg")) 
-Label(ventana_princ, image=img, anchor="nw").pack()
 
-ventana_princ.iconbitmap("avion.ico")
+img = ImageTk.PhotoImage(Image.open(r"C:\Users\941878\Desktop\app\stratoflex-logo.jpg"))
+Label(ventana_princ, image=img, anchor="nw").pack()
+ventana_princ.iconbitmap(r"C:\Users\941878\Desktop\app\avion.ico")
 
 #Botones de interfaz principal
 boton_entradas = tk.Button(ventana_princ, text="Entradas", command=show_entradas)
@@ -425,6 +447,7 @@ boton_registros = tk.Button(ventana_princ, text="Registros", command=show_regist
 boton_salir = tk.Button(ventana_princ, text="Salir", command=Salir_app)
 boton_consulta = tk.Button(ventana_princ, text="Consulta", command=show_consultas)
 boton_intransit = tk.Button(ventana_princ, text="Intransit", command=show_intransit_interfaz)
+boton_materiales = tk.Button(ventana_princ, text="Materiales", command=materiales_alta_baja_delete)
 
 #Botones, combobox titulos y mas
 titulo_entradas = tk.Label(ventana_princ, text="Entradas")
@@ -461,14 +484,29 @@ boton_reg_entradas = tk.Button(ventana_princ, text="Registro de entradas", comma
 boton_reg_salidas = tk.Button(ventana_princ, text="Registro de Salidas", command=export_excel_salidas)
 boton_inventario = tk.Button(ventana_princ, text="Inventario", command=export_excel_inventario)
 
+boton_alta_producto = tk.Button(ventana_princ, text="Agregar", command=lambda: (tamano_ventana_uno(), alta_materiales()))
+boton_baja_producto = tk.Button(ventana_princ, text="Eliminar", command=lambda: (tamano_ventana_uno(), baja_materiales()))
+boton_actualizar_producto = tk.Button(ventana_princ, text="Actualizar", command=lambda: (tamano_ventana_uno(), update_materiales()))
+
+#Campos de texto y etiqquetas para modulo de eliminar productos
+no_parte_interno_del = tk.Entry(ventana_princ)
+nombre_producto_del = tk.Entry(ventana_princ)
+no_parte_del = tk.Entry(ventana_princ)
+presentancion_del = tk.Entry(ventana_princ)
+stock_del = tk.Entry(ventana_princ)
+precio_unitario_del = tk.Entry(ventana_princ)
+moneda_del = tk.Entry(ventana_princ)
+lead_time_del = tk.Entry(ventana_princ)
+demanda_diaria_del = tk.Entry(ventana_princ)
+min_del = tk.Entry(ventana_princ)
+punto_reorden_del = tk.Entry(ventana_princ)
+
+
+
 stock_textbox = tk.Entry(ventana_princ)
-stock_textbox.pack(pady=5)
- 
 accion_textbox = tk.Entry(ventana_princ)
-accion_textbox.pack(pady=5)
 
 stock_int = tk.Entry(ventana_princ)
-
 
 combo = ttk.Combobox(ventana_princ, state="readonly", font=Font(size=15))
 

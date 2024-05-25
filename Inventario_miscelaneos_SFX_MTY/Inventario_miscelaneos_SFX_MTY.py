@@ -1,3 +1,5 @@
+from multiprocessing import Value
+from re import X
 from tkinter import ANCHOR, CENTER, CURRENT, LEFT, Label, ttk
 from tkinter import filedialog
 from tkinter.font import Font
@@ -13,7 +15,7 @@ import datetime
 Server = "SFX02EU8JX4HK3"
 Database = "miscelaneos_db "
 user = "RamiroSFXPruebas"
-password = "Danganronpa10"
+password = "Danganronpa11"
 
 from sqlalchemy.engine import URL
 cadena_conection = f"DRIVER={{SQL SERVER}};SERVER={Server};DATABASE={Database};UID={user};PWD={password}"
@@ -58,6 +60,9 @@ def clear_window():
 
 def tamano_ventana_uno():
      ventana_princ.geometry("1210x600")
+
+def tamano_ventana_dos():
+    ventana_princ.geometry("500x200")
         
 
 
@@ -68,6 +73,7 @@ def cargar_productos():
         combo['values'] = tuple(datos)
     except Exception as e:
         print(f"Error al cargar productos: {e}")
+
 
 
 def show_entradas():
@@ -189,18 +195,569 @@ def materiales_alta_baja_delete():
     boton_alta_producto.place(x=100, y=90)
     boton_actualizar_producto.place(x=220, y=90)
     boton_baja_producto.place(x=340, y=90)
-   
+    boton_volver.place(x=340, y=150)
+
 
 def baja_materiales():
     clear_window()
+
+    productos_del = cargar_productos()
+
+    no_parte_interno_del.place(x=250, y=60)
+    material_label = tk.Label(ventana_princ, text="Numero de parte interno")
+    material_label.place(x=50, y=60)
+    material_label.config(bg="white",
+                         font=("Arial Black",10))
+
+    nombre_producto_del = ttk.Combobox(ventana_princ, values=productos_del)
+    nombre_producto_del.place(x=580, y=60)
+    nombre_producto_del.config(font=("Arial Black",10))
+    material_label_1 = tk.Label(ventana_princ, text="Nombre del producto")
+    material_label_1.place(x=400, y=60)
+    material_label_1.config(bg="white",
+                         font=("Arial Black",10))
+
+    no_parte_del.place(x=930, y=60)
+    material_label_2 = tk.Label(ventana_princ, text="Numero de parte")
+    material_label_2.place(x=790, y=60)
+    material_label_2.config(bg="white",
+                         font=("Arial Black",10))
+
+    presentancion_del.place(x=170, y=120)
+    material_label_3 = tk.Label(ventana_princ, text="Presentacion")
+    material_label_3.place(x=50, y=120)
+    material_label_3.config(bg="white",
+                         font=("Arial Black",10))
+
+    stock_del.place(x=390, y=120)
+    material_label_4 = tk.Label(ventana_princ, text="Stock")
+    material_label_4.place(x=320, y=120)
+    material_label_4.config(bg="white",
+                         font=("Arial Black",10))
+
+    precio_unitario_del.place(x=675, y=120)
+    material_label_5 = tk.Label(ventana_princ, text="Precio unitario")
+    material_label_5.place(x=540, y=120)
+    material_label_5.config(bg="white",
+                         font=("Arial Black",10))
+
+    moneda_del.place(x=130, y=180)
+    material_label_6 = tk.Label(ventana_princ, text="Moneda")
+    material_label_6.place(x=50, y=180)
+    material_label_6.config(bg="white",
+                         font=("Arial Black",10))
+
+    lead_time_del.place(x=370, y=180)
+    material_label_7 = tk.Label(ventana_princ, text="Lead time")
+    material_label_7.place(x=270, y=180)
+    material_label_7.config(bg="white",
+                         font=("Arial Black",10))
+
+    demanda_diaria_del.place(x=650, y=180)
+    material_label_8 = tk.Label(ventana_princ, text="Demanda diaria")
+    material_label_8.place(x=510, y=180)
+    material_label_8.config(bg="white",
+                         font=("Arial Black",10))
+
+    min_del.place(x=840, y=180)
+    material_label_9 = tk.Label(ventana_princ, text="Min")
+    material_label_9.place(x=790, y=180)
+    material_label_9.config(bg="white",
+                         font=("Arial Black",10))
+
+    punto_reorden_del.place(x=950, y=120)
+    material_label_10 = tk.Label(ventana_princ, text="Punto Reorden")
+    material_label_10.place(x=820, y=120)
+    material_label_10.config(bg="white",
+                         font=("Arial Black",10))
+
+    max_del.place(x=100, y=240)
+    material_label_11 = tk.Label(ventana_princ, text="Max")
+    material_label_11.place(x=50, y=240)
+    material_label_11.config(bg="white",
+                         font=("Arial Black",10))
+    
+    dias_del.place(x=305, y=240)
+    material_label_12 = tk.Label(ventana_princ, text="Dias")
+    material_label_12.place(x=250, y=240)
+    material_label_12.config(bg="white",
+                         font=("Arial Black",10))
+
+    Accion_del.place(x=530, y=240)
+    material_label_13 = tk.Label(ventana_princ, text="Accion")
+    material_label_13.place(x=450, y=240)
+    material_label_13.config(bg="white",
+                         font=("Arial Black",10))
+
+    Qty_to_Order_del.place(x=730, y=240)
+    material_label_14 = tk.Label(ventana_princ, text="Qty")
+    material_label_14.place(x=680, y=240)
+    material_label_14.config(bg="white",
+                         font=("Arial Black",10))
+
+    intran_del.place(x=950, y=240)
+    material_label_15 = tk.Label(ventana_princ, text="Intran")
+    material_label_15.place(x=880, y=240)
+    material_label_15.config(bg="white",
+                         font=("Arial Black",10))
+
+    comentarios_de_po_del.place(x=210, y=300)
+    material_label_16 = tk.Label(ventana_princ, text="Comentarios de po")
+    material_label_16.place(x=50, y=300)
+    material_label_16.config(bg="white",
+                         font=("Arial Black",10))
+
+    notas_del.place(x=430, y=300)
+    material_label_17 = tk.Label(ventana_princ, text="Notas")
+    material_label_17.place(x=360, y=300)
+    material_label_17.config(bg="white",
+                         font=("Arial Black",10))
+
+    no_proveedor_del.place(x=730, y=300)
+    material_label_18 = tk.Label(ventana_princ, text="No. de Proveedor")
+    material_label_18.place(x=580, y=300)
+    material_label_18.config(bg="white",
+                         font=("Arial Black",10))
+
+    proveedor_del.place(x=980, y=300)
+    material_label_19 = tk.Label(ventana_princ, text="Proveedor")
+    material_label_19.place(x=880, y=300)
+    material_label_19.config(bg="white",
+                         font=("Arial Black",10))
+
+    contacto_del.place(x=140, y=360)
+    material_label_20 = tk.Label(ventana_princ, text="Contacto")
+    material_label_20.place(x=50, y=360)
+    material_label_20.config(bg="white",
+                         font=("Arial Black",10))
+
+    sistema_del.place(x=360, y=360)
+    material_label_21 = tk.Label(ventana_princ, text="Sistema")
+    material_label_21.place(x=280, y=360)
+    material_label_21.config(bg="white",
+                         font=("Arial Black",10))
+
+    centro_cuenta_del.place(x=650, y=360)
+    material_label_22 = tk.Label(ventana_princ, text="Centro de cuenta")
+    material_label_22.place(x=500, y=360)
+    material_label_22.config(bg="white",
+                         font=("Arial Black",10))
+
+    ubicacion_del.place(x=890, y=360)
+    material_label_23 = tk.Label(ventana_princ, text="Ubicacion")
+    material_label_23.place(x=790, y=360)
+    material_label_23.config(bg="white",
+                         font=("Arial Black",10))
+
+    centro_del.place(x=120, y=420)
+    material_label_24 = tk.Label(ventana_princ, text="Centro")
+    material_label_24.place(x=50, y=420)
+    material_label_24.config(bg="white",
+                         font=("Arial Black",10))
+
+    cuenta_del.place(x=345, y=420)
+    material_label_25 = tk.Label(ventana_princ, text="Cuenta")
+    material_label_25.place(x=270, y=420)
+    material_label_25.config(bg="white",
+                         font=("Arial Black",10))
+
+    Orden_ubicacion_one_del.place(x=650, y=420)
+    material_label_26 = tk.Label(ventana_princ, text="Orden Ubicacion 1")
+    material_label_26.place(x=490, y=420)
+    material_label_26.config(bg="white",
+                         font=("Arial Black",10))
+
+    Orden_ubicacion_two_del.place(x=960, y=420)
+    material_label_27 = tk.Label(ventana_princ, text="Orden Ubicacion 2")
+    material_label_27.place(x=800, y=420)
+    material_label_27.config(bg="white",
+                         font=("Arial Black",10))
+
+    category_del.place(x=140, y=480)
+    material_label_28 = tk.Label(ventana_princ, text="Categoria")
+    material_label_28.place(x=50, y=480)
+    material_label_28.config(bg="white",
+                         font=("Arial Black",10))
+
+    po_or_req_del.place(x=400, y=480)
+    material_label_28 = tk.Label(ventana_princ, text="po or req")
+    material_label_28.place(x=300, y=480)
+    material_label_28.config(bg="white",
+                         font=("Arial Black",10))
+
+    boton_volver_menu_abc.place(x=1000, y=540)
 
 
 
 def alta_materiales():
     clear_window()
 
+    no_parte_interno_del.place(x=250, y=60)
+    material_label = tk.Label(ventana_princ, text="Numero de parte interno")
+    material_label.place(x=50, y=60)
+    material_label.config(bg="white",
+                         font=("Arial Black",10))
+
+    nombre_producto_del.place(x=580, y=60)
+    material_label_1 = tk.Label(ventana_princ, text="Nombre del producto")
+    material_label_1.place(x=400, y=60)
+    material_label_1.config(bg="white",
+                         font=("Arial Black",10))
+    
+    no_parte_del.place(x=900, y=60)
+    material_label_2 = tk.Label(ventana_princ, text="Numero de parte")
+    material_label_2.place(x=730, y=60)
+    material_label_2.config(bg="white",
+                         font=("Arial Black",10))
+
+    presentancion_del.place(x=170, y=120)
+    material_label_3 = tk.Label(ventana_princ, text="Presentacion")
+    material_label_3.place(x=50, y=120)
+    material_label_3.config(bg="white",
+                         font=("Arial Black",10))
+
+    stock_del.place(x=390, y=120)
+    material_label_4 = tk.Label(ventana_princ, text="Stock")
+    material_label_4.place(x=320, y=120)
+    material_label_4.config(bg="white",
+                         font=("Arial Black",10))
+
+    precio_unitario_del.place(x=675, y=120)
+    material_label_5 = tk.Label(ventana_princ, text="Precio unitario")
+    material_label_5.place(x=540, y=120)
+    material_label_5.config(bg="white",
+                         font=("Arial Black",10))
+
+    moneda_del.place(x=130, y=180)
+    material_label_6 = tk.Label(ventana_princ, text="Moneda")
+    material_label_6.place(x=50, y=180)
+    material_label_6.config(bg="white",
+                         font=("Arial Black",10))
+
+    lead_time_del.place(x=370, y=180)
+    material_label_7 = tk.Label(ventana_princ, text="Lead time")
+    material_label_7.place(x=270, y=180)
+    material_label_7.config(bg="white",
+                         font=("Arial Black",10))
+
+    demanda_diaria_del.place(x=650, y=180)
+    material_label_8 = tk.Label(ventana_princ, text="Demanda diaria")
+    material_label_8.place(x=510, y=180)
+    material_label_8.config(bg="white",
+                         font=("Arial Black",10))
+
+    min_del.place(x=840, y=180)
+    material_label_9 = tk.Label(ventana_princ, text="Min")
+    material_label_9.place(x=790, y=180)
+    material_label_9.config(bg="white",
+                         font=("Arial Black",10))
+
+    punto_reorden_del.place(x=950, y=120)
+    material_label_10 = tk.Label(ventana_princ, text="Punto Reorden")
+    material_label_10.place(x=820, y=120)
+    material_label_10.config(bg="white",
+                         font=("Arial Black",10))
+
+    max_del.place(x=100, y=240)
+    material_label_11 = tk.Label(ventana_princ, text="Max")
+    material_label_11.place(x=50, y=240)
+    material_label_11.config(bg="white",
+                         font=("Arial Black",10))
+    
+    dias_del.place(x=305, y=240)
+    material_label_12 = tk.Label(ventana_princ, text="Dias")
+    material_label_12.place(x=250, y=240)
+    material_label_12.config(bg="white",
+                         font=("Arial Black",10))
+
+    Accion_del.place(x=530, y=240)
+    material_label_13 = tk.Label(ventana_princ, text="Accion")
+    material_label_13.place(x=450, y=240)
+    material_label_13.config(bg="white",
+                         font=("Arial Black",10))
+
+    Qty_to_Order_del.place(x=730, y=240)
+    material_label_14 = tk.Label(ventana_princ, text="Qty")
+    material_label_14.place(x=680, y=240)
+    material_label_14.config(bg="white",
+                         font=("Arial Black",10))
+
+    intran_del.place(x=950, y=240)
+    material_label_15 = tk.Label(ventana_princ, text="Intran")
+    material_label_15.place(x=880, y=240)
+    material_label_15.config(bg="white",
+                         font=("Arial Black",10))
+
+    comentarios_de_po_del.place(x=210, y=300)
+    material_label_16 = tk.Label(ventana_princ, text="Comentarios de po")
+    material_label_16.place(x=50, y=300)
+    material_label_16.config(bg="white",
+                         font=("Arial Black",10))
+
+    notas_del.place(x=430, y=300)
+    material_label_17 = tk.Label(ventana_princ, text="Notas")
+    material_label_17.place(x=360, y=300)
+    material_label_17.config(bg="white",
+                         font=("Arial Black",10))
+
+    no_proveedor_del.place(x=730, y=300)
+    material_label_18 = tk.Label(ventana_princ, text="No. de Proveedor")
+    material_label_18.place(x=580, y=300)
+    material_label_18.config(bg="white",
+                         font=("Arial Black",10))
+
+    proveedor_del.place(x=980, y=300)
+    material_label_19 = tk.Label(ventana_princ, text="Proveedor")
+    material_label_19.place(x=880, y=300)
+    material_label_19.config(bg="white",
+                         font=("Arial Black",10))
+
+    contacto_del.place(x=140, y=360)
+    material_label_20 = tk.Label(ventana_princ, text="Contacto")
+    material_label_20.place(x=50, y=360)
+    material_label_20.config(bg="white",
+                         font=("Arial Black",10))
+
+    sistema_del.place(x=360, y=360)
+    material_label_21 = tk.Label(ventana_princ, text="Sistema")
+    material_label_21.place(x=280, y=360)
+    material_label_21.config(bg="white",
+                         font=("Arial Black",10))
+
+    centro_cuenta_del.place(x=650, y=360)
+    material_label_22 = tk.Label(ventana_princ, text="Centro de cuenta")
+    material_label_22.place(x=500, y=360)
+    material_label_22.config(bg="white",
+                         font=("Arial Black",10))
+
+    ubicacion_del.place(x=890, y=360)
+    material_label_23 = tk.Label(ventana_princ, text="Ubicacion")
+    material_label_23.place(x=790, y=360)
+    material_label_23.config(bg="white",
+                         font=("Arial Black",10))
+
+    centro_del.place(x=120, y=420)
+    material_label_24 = tk.Label(ventana_princ, text="Centro")
+    material_label_24.place(x=50, y=420)
+    material_label_24.config(bg="white",
+                         font=("Arial Black",10))
+
+    cuenta_del.place(x=345, y=420)
+    material_label_25 = tk.Label(ventana_princ, text="Cuenta")
+    material_label_25.place(x=270, y=420)
+    material_label_25.config(bg="white",
+                         font=("Arial Black",10))
+
+    Orden_ubicacion_one_del.place(x=650, y=420)
+    material_label_26 = tk.Label(ventana_princ, text="Orden Ubicacion 1")
+    material_label_26.place(x=490, y=420)
+    material_label_26.config(bg="white",
+                         font=("Arial Black",10))
+
+    Orden_ubicacion_two_del.place(x=960, y=420)
+    material_label_27 = tk.Label(ventana_princ, text="Orden Ubicacion 2")
+    material_label_27.place(x=800, y=420)
+    material_label_27.config(bg="white",
+                         font=("Arial Black",10))
+
+    category_del.place(x=140, y=480)
+    material_label_28 = tk.Label(ventana_princ, text="Categoria")
+    material_label_28.place(x=50, y=480)
+    material_label_28.config(bg="white",
+                         font=("Arial Black",10))
+
+    po_or_req_del.place(x=400, y=480)
+    material_label_28 = tk.Label(ventana_princ, text="po or req")
+    material_label_28.place(x=300, y=480)
+    material_label_28.config(bg="white",
+                         font=("Arial Black",10))
+
+    boton_volver_menu_abc.place(x=1000, y=540)
+
 def update_materiales():
     clear_window()
+
+    no_parte_interno_del.place(x=250, y=60)
+    material_label = tk.Label(ventana_princ, text="Numero de parte interno")
+    material_label.place(x=50, y=60)
+    material_label.config(bg="white",
+                         font=("Arial Black",10))
+
+    nombre_producto_del.place(x=580, y=60)
+    material_label_1 = tk.Label(ventana_princ, text="Nombre del producto")
+    material_label_1.place(x=400, y=60)
+    material_label_1.config(bg="white",
+                         font=("Arial Black",10))
+    
+    no_parte_del.place(x=900, y=60)
+    material_label_2 = tk.Label(ventana_princ, text="Numero de parte")
+    material_label_2.place(x=730, y=60)
+    material_label_2.config(bg="white",
+                         font=("Arial Black",10))
+
+    presentancion_del.place(x=170, y=120)
+    material_label_3 = tk.Label(ventana_princ, text="Presentacion")
+    material_label_3.place(x=50, y=120)
+    material_label_3.config(bg="white",
+                         font=("Arial Black",10))
+
+    stock_del.place(x=390, y=120)
+    material_label_4 = tk.Label(ventana_princ, text="Stock")
+    material_label_4.place(x=320, y=120)
+    material_label_4.config(bg="white",
+                         font=("Arial Black",10))
+
+    precio_unitario_del.place(x=675, y=120)
+    material_label_5 = tk.Label(ventana_princ, text="Precio unitario")
+    material_label_5.place(x=540, y=120)
+    material_label_5.config(bg="white",
+                         font=("Arial Black",10))
+
+    moneda_del.place(x=130, y=180)
+    material_label_6 = tk.Label(ventana_princ, text="Moneda")
+    material_label_6.place(x=50, y=180)
+    material_label_6.config(bg="white",
+                         font=("Arial Black",10))
+
+    lead_time_del.place(x=370, y=180)
+    material_label_7 = tk.Label(ventana_princ, text="Lead time")
+    material_label_7.place(x=270, y=180)
+    material_label_7.config(bg="white",
+                         font=("Arial Black",10))
+
+    demanda_diaria_del.place(x=650, y=180)
+    material_label_8 = tk.Label(ventana_princ, text="Demanda diaria")
+    material_label_8.place(x=510, y=180)
+    material_label_8.config(bg="white",
+                         font=("Arial Black",10))
+
+    min_del.place(x=840, y=180)
+    material_label_9 = tk.Label(ventana_princ, text="Min")
+    material_label_9.place(x=790, y=180)
+    material_label_9.config(bg="white",
+                         font=("Arial Black",10))
+
+    punto_reorden_del.place(x=950, y=120)
+    material_label_10 = tk.Label(ventana_princ, text="Punto Reorden")
+    material_label_10.place(x=820, y=120)
+    material_label_10.config(bg="white",
+                         font=("Arial Black",10))
+
+    max_del.place(x=100, y=240)
+    material_label_11 = tk.Label(ventana_princ, text="Max")
+    material_label_11.place(x=50, y=240)
+    material_label_11.config(bg="white",
+                         font=("Arial Black",10))
+    
+    dias_del.place(x=305, y=240)
+    material_label_12 = tk.Label(ventana_princ, text="Dias")
+    material_label_12.place(x=250, y=240)
+    material_label_12.config(bg="white",
+                         font=("Arial Black",10))
+
+    Accion_del.place(x=530, y=240)
+    material_label_13 = tk.Label(ventana_princ, text="Accion")
+    material_label_13.place(x=450, y=240)
+    material_label_13.config(bg="white",
+                         font=("Arial Black",10))
+
+    Qty_to_Order_del.place(x=730, y=240)
+    material_label_14 = tk.Label(ventana_princ, text="Qty")
+    material_label_14.place(x=680, y=240)
+    material_label_14.config(bg="white",
+                         font=("Arial Black",10))
+
+    intran_del.place(x=950, y=240)
+    material_label_15 = tk.Label(ventana_princ, text="Intran")
+    material_label_15.place(x=880, y=240)
+    material_label_15.config(bg="white",
+                         font=("Arial Black",10))
+
+    comentarios_de_po_del.place(x=210, y=300)
+    material_label_16 = tk.Label(ventana_princ, text="Comentarios de po")
+    material_label_16.place(x=50, y=300)
+    material_label_16.config(bg="white",
+                         font=("Arial Black",10))
+
+    notas_del.place(x=430, y=300)
+    material_label_17 = tk.Label(ventana_princ, text="Notas")
+    material_label_17.place(x=360, y=300)
+    material_label_17.config(bg="white",
+                         font=("Arial Black",10))
+
+    no_proveedor_del.place(x=730, y=300)
+    material_label_18 = tk.Label(ventana_princ, text="No. de Proveedor")
+    material_label_18.place(x=580, y=300)
+    material_label_18.config(bg="white",
+                         font=("Arial Black",10))
+
+    proveedor_del.place(x=980, y=300)
+    material_label_19 = tk.Label(ventana_princ, text="Proveedor")
+    material_label_19.place(x=880, y=300)
+    material_label_19.config(bg="white",
+                         font=("Arial Black",10))
+
+    contacto_del.place(x=140, y=360)
+    material_label_20 = tk.Label(ventana_princ, text="Contacto")
+    material_label_20.place(x=50, y=360)
+    material_label_20.config(bg="white",
+                         font=("Arial Black",10))
+
+    sistema_del.place(x=360, y=360)
+    material_label_21 = tk.Label(ventana_princ, text="Sistema")
+    material_label_21.place(x=280, y=360)
+    material_label_21.config(bg="white",
+                         font=("Arial Black",10))
+
+    centro_cuenta_del.place(x=650, y=360)
+    material_label_22 = tk.Label(ventana_princ, text="Centro de cuenta")
+    material_label_22.place(x=500, y=360)
+    material_label_22.config(bg="white",
+                         font=("Arial Black",10))
+
+    ubicacion_del.place(x=890, y=360)
+    material_label_23 = tk.Label(ventana_princ, text="Ubicacion")
+    material_label_23.place(x=790, y=360)
+    material_label_23.config(bg="white",
+                         font=("Arial Black",10))
+
+    centro_del.place(x=120, y=420)
+    material_label_24 = tk.Label(ventana_princ, text="Centro")
+    material_label_24.place(x=50, y=420)
+    material_label_24.config(bg="white",
+                         font=("Arial Black",10))
+
+    cuenta_del.place(x=345, y=420)
+    material_label_25 = tk.Label(ventana_princ, text="Cuenta")
+    material_label_25.place(x=270, y=420)
+    material_label_25.config(bg="white",
+                         font=("Arial Black",10))
+
+    Orden_ubicacion_one_del.place(x=650, y=420)
+    material_label_26 = tk.Label(ventana_princ, text="Orden Ubicacion 1")
+    material_label_26.place(x=490, y=420)
+    material_label_26.config(bg="white",
+                         font=("Arial Black",10))
+
+    Orden_ubicacion_two_del.place(x=960, y=420)
+    material_label_27 = tk.Label(ventana_princ, text="Orden Ubicacion 2")
+    material_label_27.place(x=800, y=420)
+    material_label_27.config(bg="white",
+                         font=("Arial Black",10))
+
+    category_del.place(x=140, y=480)
+    material_label_28 = tk.Label(ventana_princ, text="Categoria")
+    material_label_28.place(x=50, y=480)
+    material_label_28.config(bg="white",
+                         font=("Arial Black",10))
+
+    po_or_req_del.place(x=400, y=480)
+    material_label_28 = tk.Label(ventana_princ, text="po or req")
+    material_label_28.place(x=300, y=480)
+    material_label_28.config(bg="white",
+                         font=("Arial Black",10))
+
+    boton_volver_menu_abc.place(x=1000, y=540)
 
 
 #funcion para guardar stock entrada
@@ -217,7 +774,7 @@ def guardar_entrada():
             #convertir la cantidad a int
             cantidad = int(cantidad)
      
-            cursor.execute("UPDATE dbo.Inventarios SET stock = stock + ? WHERE Nombre_del_producto = ?", (cantidad, cantidad, nombre_del_producto))
+            cursor.execute("UPDATE dbo.Inventarios SET stock = stock + ? WHERE Nombre_del_producto = ?", (cantidad, nombre_del_producto))
            
             cursor.execute("SELECT stock, Punto_Reorden FROM dbo.Inventarios WHERE Nombre_del_producto = ?", (nombre_del_producto,))
             resultado_ent = cursor.fetchone()
@@ -415,6 +972,7 @@ def export_excel_intransit():
     except Exception as e:
         messagebox.showerror("Error", f"Error al exportar la informacion a excel: {str(e)}")
 
+
 def limpiar_campos():
     combo.set("")
     stock_textbox.delete(0, "end")
@@ -488,7 +1046,9 @@ boton_alta_producto = tk.Button(ventana_princ, text="Agregar", command=lambda: (
 boton_baja_producto = tk.Button(ventana_princ, text="Eliminar", command=lambda: (tamano_ventana_uno(), baja_materiales()))
 boton_actualizar_producto = tk.Button(ventana_princ, text="Actualizar", command=lambda: (tamano_ventana_uno(), update_materiales()))
 
-#Campos de texto y etiqquetas para modulo de eliminar productos
+boton_volver_menu_abc = tk.Button(ventana_princ, text="volver", command=lambda: (tamano_ventana_dos(), materiales_alta_baja_delete()))
+
+#Campos de texto y etiquetas para modulo de eliminar productos
 no_parte_interno_del = tk.Entry(ventana_princ)
 nombre_producto_del = tk.Entry(ventana_princ)
 no_parte_del = tk.Entry(ventana_princ)
@@ -500,7 +1060,25 @@ lead_time_del = tk.Entry(ventana_princ)
 demanda_diaria_del = tk.Entry(ventana_princ)
 min_del = tk.Entry(ventana_princ)
 punto_reorden_del = tk.Entry(ventana_princ)
-
+max_del = tk.Entry(ventana_princ)
+dias_del = tk.Entry(ventana_princ)
+Accion_del = tk.Entry(ventana_princ)
+Qty_to_Order_del = tk.Entry(ventana_princ)
+intran_del = tk.Entry(ventana_princ)
+comentarios_de_po_del = tk.Entry(ventana_princ)
+notas_del = tk.Entry(ventana_princ)
+no_proveedor_del = tk.Entry(ventana_princ)
+proveedor_del = tk.Entry(ventana_princ)
+contacto_del = tk.Entry(ventana_princ)
+sistema_del = tk.Entry(ventana_princ)
+centro_cuenta_del = tk.Entry(ventana_princ)
+ubicacion_del = tk.Entry(ventana_princ)
+centro_del = tk.Entry(ventana_princ)
+cuenta_del = tk.Entry(ventana_princ)
+Orden_ubicacion_one_del = tk.Entry(ventana_princ)
+Orden_ubicacion_two_del = tk.Entry(ventana_princ)
+category_del = tk.Entry(ventana_princ)
+po_or_req_del = tk.Entry(ventana_princ)
 
 
 stock_textbox = tk.Entry(ventana_princ)

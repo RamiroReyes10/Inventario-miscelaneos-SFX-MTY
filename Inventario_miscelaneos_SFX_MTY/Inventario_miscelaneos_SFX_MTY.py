@@ -994,9 +994,9 @@ ventana_princ.geometry("500x200")
 ventana_princ.resizable(width=False, height=False)
 
 
-img = ImageTk.PhotoImage(Image.open(r"C:\Users\941878\Desktop\app\stratoflex-logo.jpg"))
+img = ImageTk.PhotoImage(file="stratoflex-logo.jpg")
 Label(ventana_princ, image=img, anchor="nw").pack()
-ventana_princ.iconbitmap(r"C:\Users\941878\Desktop\app\avion.ico")
+ventana_princ.iconbitmap("avion.ico")
 
 #Botones de interfaz principal
 boton_entradas = tk.Button(ventana_princ, text="Entradas", command=show_entradas)

@@ -4,6 +4,8 @@ from tkinter import ANCHOR, CENTER, CURRENT, LEFT, Label, ttk
 from tkinter import filedialog
 from tkinter.font import Font
 from turtle import window_height, window_width
+from typing import Text
+from numpy import size
 import pyodbc
 import tkinter as tk
 import pandas as pd
@@ -11,6 +13,8 @@ from tkinter import messagebox
 import os
 from PIL import Image, ImageTk
 import datetime
+
+from sqlalchemy.orm import state
 
 Server = "SFX02EU8JX4HK3"
 Database = "miscelaneos_db "
@@ -21,7 +25,7 @@ from sqlalchemy.engine import URL
 cadena_conection = f"DRIVER={{SQL SERVER}};SERVER={Server};DATABASE={Database};UID={user};PWD={password}"
 url_conection = URL.create("mssql+pyodbc", query={"odbc_connect": cadena_conection})
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, values
 engine = create_engine(url_conection)
 
 try: 
@@ -73,6 +77,16 @@ def cargar_productos():
         combo['values'] = tuple(datos)
     except Exception as e:
         print(f"Error al cargar productos: {e}")
+
+        
+def cargar_productos_del():
+        try:
+            cursor.execute("SELECT [Nombre_del_producto] FROM dbo.Inventarios")
+            datos = [fila.Nombre_del_producto for fila in cursor.fetchall()]
+            print("Datos recuperados:", datos) 
+            combobox_productos_del['values'] = tuple(datos)
+        except Exception as e:
+              print(f"Error al cargar productos: {e}")
 
 
 
@@ -196,27 +210,23 @@ def materiales_alta_baja_delete():
     boton_actualizar_producto.place(x=220, y=90)
     boton_baja_producto.place(x=340, y=90)
     boton_volver.place(x=340, y=150)
-
-
+    
+        
 def baja_materiales():
     clear_window()
-
-    productos_del = cargar_productos()
-
+  
     no_parte_interno_del.place(x=250, y=60)
     material_label = tk.Label(ventana_princ, text="Numero de parte interno")
     material_label.place(x=50, y=60)
     material_label.config(bg="white",
                          font=("Arial Black",10))
 
-    nombre_producto_del = ttk.Combobox(ventana_princ, values=productos_del)
     nombre_producto_del.place(x=580, y=60)
-    nombre_producto_del.config(font=("Arial Black",10))
     material_label_1 = tk.Label(ventana_princ, text="Nombre del producto")
     material_label_1.place(x=400, y=60)
     material_label_1.config(bg="white",
                          font=("Arial Black",10))
-
+    
     no_parte_del.place(x=930, y=60)
     material_label_2 = tk.Label(ventana_princ, text="Numero de parte")
     material_label_2.place(x=790, y=60)
@@ -374,205 +384,405 @@ def baja_materiales():
                          font=("Arial Black",10))
 
     category_del.place(x=140, y=480)
-    material_label_28 = tk.Label(ventana_princ, text="Categoria")
-    material_label_28.place(x=50, y=480)
-    material_label_28.config(bg="white",
+    material_label_29 = tk.Label(ventana_princ, text="Categoria")
+    material_label_29.place(x=50, y=480)
+    material_label_29.config(bg="white",
                          font=("Arial Black",10))
 
     po_or_req_del.place(x=400, y=480)
-    material_label_28 = tk.Label(ventana_princ, text="po or req")
-    material_label_28.place(x=300, y=480)
-    material_label_28.config(bg="white",
+    material_label_30 = tk.Label(ventana_princ, text="po or req")
+    material_label_30.place(x=300, y=480)
+    material_label_30.config(bg="white",
                          font=("Arial Black",10))
 
     boton_volver_menu_abc.place(x=1000, y=540)
+    boton_para_escoger_produto_del.place(x=500, y=540)
+    
+    boton_eliminar_producto = tk.Button(ventana_princ, text="Eliminar Producto", command=eliminar_matrial_inventario)
+    boton_eliminar_producto.place(x=700, y=540)
+    
+def cargar_fila_producto(producto_seleccionado):
+    try:
+        cursor.execute("SELECT * FROM dbo.Inventarios WHERE [Nombre_del_producto] = ?", (producto_seleccionado,))
+        fila_producto = cursor.fetchone()
+
+        if fila_producto:
+            return fila_producto
+        else:
+            print("No se encontró ninguna fila para el producto seleccionado")
+            return None
+    except Exception as e:
+        print(f"Error al cargar la fila del producto: {e}")
+        return None
+
+    
+def ventana_lista_de_productos_del():
+    def aceptar():
+        producto_seleccionado = combobox_productos_del.get()
+        fila_producto = cargar_fila_producto(producto_seleccionado)
+        if fila_producto:
+            cargar_datos_en_ventana_del(fila_producto)
+            ventana_princ.deiconify()
+            ventana_prod_del.destroy()
+
+    ventana_princ.withdraw()  # Ocultar la ventana principal mientras se muestra la ventana de productos
+
+    ventana_prod_del = tk.Toplevel(ventana_princ)
+    ventana_prod_del.title("Producto-Materiales")
+    ventana_prod_del.geometry("500x200")
+    ventana_prod_del.resizable(width=False, height=False)
+    ventana_prod_del.config(bg="white")
+
+    combobox_productos_del = ttk.Combobox(ventana_prod_del)
+    combobox_productos_del.place(x=250, y=50)
+    combobox_productos_del.config(font=("Arial Black", 10))
+
+    try:
+        cursor.execute("SELECT [Nombre_del_producto] FROM dbo.Inventarios")
+        datos = [fila.Nombre_del_producto for fila in cursor.fetchall()]
+        combobox_productos_del['values'] = tuple(datos)
+    except Exception as e:
+        print(f"Error al cargar productos: {e}")
+
+    subtitulo = tk.Label(ventana_prod_del, text="Seleccione el producto")
+    subtitulo.place(x=50, y=50)
+    subtitulo.config(bg="white", font=("Arial Black", 10))
+
+    boton_aceptar = tk.Button(ventana_prod_del, text="Aceptar", command=aceptar)
+    boton_aceptar.place(x=200, y=100)
+    
+
+def limpiar_campos_del():
+    no_parte_interno_del.delete(0, tk.END)
+    nombre_producto_del.delete(0, tk.END)
+    no_parte_del.delete(0, tk.END)
+    presentancion_del.delete(0, tk.END)
+    stock_del.delete(0, tk.END)
+    precio_unitario_del.delete(0, tk.END)
+    moneda_del.delete(0, tk.END)
+    lead_time_del.delete(0, tk.END)
+    demanda_diaria_del.delete(0, tk.END)
+    min_del.delete(0, tk.END)
+    punto_reorden_del.delete(0, tk.END)
+    max_del.delete(0, tk.END)
+    dias_del.delete(0, tk.END)
+    Accion_del.delete(0, tk.END)
+    Qty_to_Order_del.delete(0, tk.END)
+    intran_del.delete(0, tk.END)
+    comentarios_de_po_del.delete(0, tk.END)
+    notas_del.delete(0, tk.END)
+    no_proveedor_del.delete(0, tk.END)
+    proveedor_del.delete(0, tk.END)
+    contacto_del.delete(0, tk.END)
+    sistema_del.delete(0, tk.END)
+    centro_cuenta_del.delete(0, tk.END)
+    ubicacion_del.delete(0, tk.END)
+    centro_del.delete(0, tk.END)
+    cuenta_del.delete(0, tk.END)
+    Orden_ubicacion_one_del.delete(0, tk.END)
+    Orden_ubicacion_two_del.delete(0, tk.END)
+    category_del.delete(0, tk.END)
+    po_or_req_del.delete(0, tk.END) 
+
+    
+def cargar_datos_en_ventana_del(fila_del_producto):
+    limpiar_campos_del() 
+
+    no_parte_interno_del.insert(0, str(fila_del_producto.No_parte_interno))
+    nombre_producto_del.insert(0, str(fila_del_producto.Nombre_del_producto))
+    no_parte_del.insert(0, str(fila_del_producto.No_Parte))
+    presentancion_del.insert(0, str(fila_del_producto.Presentacion))
+    stock_del.insert(0, str(fila_del_producto.stock))
+    precio_unitario_del.insert(0, str(fila_del_producto.precio_unitario))
+    moneda_del.insert(0, str(fila_del_producto.Moneda))
+    lead_time_del.insert(0, str(fila_del_producto.Lead_Time))
+    demanda_diaria_del.insert(0, str(fila_del_producto.Demanda_diaria))
+    min_del.insert(0, str(fila_del_producto.Min))
+    punto_reorden_del.insert(0, str(fila_del_producto.Punto_Reorden))
+    max_del.insert(0, str(fila_del_producto.Max))
+    dias_del.insert(0, str(fila_del_producto.Dias))
+    Accion_del.insert(0, str(fila_del_producto.Accion))
+    Qty_to_Order_del.insert(0, str(fila_del_producto.Qty_to_Order))
+    intran_del.insert(0, str(fila_del_producto.intran))
+    comentarios_de_po_del.insert(0, str(fila_del_producto.Comentarios_de_PO))
+    notas_del.insert(0, str(fila_del_producto.Notas))
+    no_proveedor_del.insert(0, str(fila_del_producto.No_Proveedor))
+    proveedor_del.insert(0, str(fila_del_producto.Proveedor))
+    contacto_del.insert(0, str(fila_del_producto.Contacto))
+    sistema_del.insert(0, str(fila_del_producto.Sistema))
+    centro_cuenta_del.insert(0, str(fila_del_producto.Centro_cuenta))
+    ubicacion_del.insert(0, str(fila_del_producto.Ubicacion))
+    centro_del.insert(0, str(fila_del_producto.Centro))
+    cuenta_del.insert(0, str(fila_del_producto.Cuenta))
+    Orden_ubicacion_one_del.insert(0, str(fila_del_producto.Orden_ubicacion_1))
+    Orden_ubicacion_two_del.insert(0, str(fila_del_producto.Orden_ubicacion_2))
+    category_del.insert(0, str(fila_del_producto.Category))
+    po_or_req_del.insert(0, str(fila_del_producto.PO_or_REQ))
+    
+def eliminar_matrial_inventario():
+     nombre_producto =  nombre_producto_del.get()
+     
+     if nombre_producto:
+         respuesta = messagebox.askyesno("Confirmar", "¿Estás seguro de que deseas eliminar este producto?")
+         if respuesta:
+            try:
+                connection = pyodbc.connect(
+                  'DRIVER={SQL Server};'
+                   f'SERVER={Server};'
+                   f'DATABASE={Database};'
+                   f'UID={user};'
+                   f'PWD={password}'
+                   )
+                
+                cursor = connection.cursor()
+                cursor.execute("DELETE FROM dbo.Inventarios WHERE Nombre_del_producto = ?", nombre_producto)
+                connection.commit()
+                cursor.close()
+                connection.close()
+             
+                limpiar_campos_del()
+                messagebox.showinfo("Éxito", "Producto eliminado exitosamente")    
+            except Exception as e:
+                 messagebox.showerror("Error", f"Ocurrió un error al eliminar el producto: {e}")
+         else:
+            messagebox.showinfo("Cancelado", "La eliminación del producto fue cancelada")
+     else:
+         messagebox.showwarning("Advertencia", "Primero selecciona un producto")
+           
+#Funciones completas para dar de alta un nuevo material
+def insertar_nuevo_material(datos):
+    try:
+        insert_material = "INSERT INTO dbo.Inventarios (No_parte_interno, Nombre_del_producto, No_Parte, Presentacion, stock, precio_unitario, Moneda,Lead_Time, Demanda_diaria, Min, Punto_Reorden, Max, Dias,Accion, Qty_to_Order,intran, Comentarios_de_PO, Notas,No_Proveedor,Proveedor,Contacto,Sistema,Centro_cuenta, Ubicacion, Centro, Cuenta, Orden_ubicacion_1, Orden_ubicacion_2,Category,PO_or_REQ )VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+            
+        cursor.execute(insert_material, tuple(datos.values()))
+        connection.commit()
+        
+        print("Datos Agregados correctamente")
+    except Exception as e:
+        print("Error al insertar datos")
 
 
+def guardar_datos_alta():
+    datos = {
+        'No_parte_interno': no_parte_interno_del.get(),
+        'Nombre_del_producto': nombre_producto_del.get(),
+        'No_Parte': no_parte_del.get(),
+        'Presentacion': presentancion_del.get(),
+        'stock': stock_del.get(),
+        'precio_unitario': precio_unitario_del.get(),
+        'Moneda': moneda_del.get(),
+        'Lead_Time': lead_time_del.get(),
+        'Demanda_diaria': demanda_diaria_del.get(),
+        'Min': min_del.get(),
+        'Punto_Reorden': punto_reorden_del.get(),
+        'Max': max_del.get(),
+        'Dias': dias_del.get(),
+        'Accion': Accion_del.get(),
+        'Qty_to_Order': Qty_to_Order_del.get(),
+        'intran': intran_del.get(),
+        'Comentarios_de_PO': comentarios_de_po_del.get(),
+        'Notas': notas_del.get(),
+        'No_Proveedor': no_proveedor_del.get(),
+        'Proveedor': proveedor_del.get(),
+        'Contacto': contacto_del.get(),
+        'Sistema': sistema_del.get(),
+        'Centro_cuenta': centro_cuenta_del.get(),
+        'Ubicacion': ubicacion_del.get(),
+        'Centro': centro_del.get(),
+        'Cuenta': cuenta_del.get(),
+        'Orden_ubicacion_1': Orden_ubicacion_one_del.get(),
+        'Orden_ubicacion_2': Orden_ubicacion_two_del.get(),
+        'Category': category_del.get(),
+        'PO_or_REQ': po_or_req_del.get()
+    }
+
+    insertar_nuevo_material(datos)
 
 def alta_materiales():
     clear_window()
 
-    no_parte_interno_del.place(x=250, y=60)
+    no_parte_interno_add.place(x=250, y=60)
     material_label = tk.Label(ventana_princ, text="Numero de parte interno")
     material_label.place(x=50, y=60)
     material_label.config(bg="white",
                          font=("Arial Black",10))
 
-    nombre_producto_del.place(x=580, y=60)
+    nombre_producto_add.place(x=580, y=60)
     material_label_1 = tk.Label(ventana_princ, text="Nombre del producto")
     material_label_1.place(x=400, y=60)
     material_label_1.config(bg="white",
                          font=("Arial Black",10))
     
-    no_parte_del.place(x=900, y=60)
+    no_parte_add.place(x=900, y=60)
     material_label_2 = tk.Label(ventana_princ, text="Numero de parte")
     material_label_2.place(x=730, y=60)
     material_label_2.config(bg="white",
                          font=("Arial Black",10))
 
-    presentancion_del.place(x=170, y=120)
+    presentancion_add.place(x=170, y=120)
     material_label_3 = tk.Label(ventana_princ, text="Presentacion")
     material_label_3.place(x=50, y=120)
     material_label_3.config(bg="white",
                          font=("Arial Black",10))
 
-    stock_del.place(x=390, y=120)
+    stock_add.place(x=390, y=120)
     material_label_4 = tk.Label(ventana_princ, text="Stock")
     material_label_4.place(x=320, y=120)
     material_label_4.config(bg="white",
                          font=("Arial Black",10))
 
-    precio_unitario_del.place(x=675, y=120)
+    precio_unitario_add.place(x=675, y=120)
     material_label_5 = tk.Label(ventana_princ, text="Precio unitario")
     material_label_5.place(x=540, y=120)
     material_label_5.config(bg="white",
                          font=("Arial Black",10))
 
-    moneda_del.place(x=130, y=180)
+    moneda_add.place(x=130, y=180)
     material_label_6 = tk.Label(ventana_princ, text="Moneda")
     material_label_6.place(x=50, y=180)
     material_label_6.config(bg="white",
                          font=("Arial Black",10))
 
-    lead_time_del.place(x=370, y=180)
+    lead_time_add.place(x=370, y=180)
     material_label_7 = tk.Label(ventana_princ, text="Lead time")
     material_label_7.place(x=270, y=180)
     material_label_7.config(bg="white",
                          font=("Arial Black",10))
 
-    demanda_diaria_del.place(x=650, y=180)
+    demanda_diaria_add.place(x=650, y=180)
     material_label_8 = tk.Label(ventana_princ, text="Demanda diaria")
     material_label_8.place(x=510, y=180)
     material_label_8.config(bg="white",
                          font=("Arial Black",10))
 
-    min_del.place(x=840, y=180)
+    min_add.place(x=840, y=180)
     material_label_9 = tk.Label(ventana_princ, text="Min")
     material_label_9.place(x=790, y=180)
     material_label_9.config(bg="white",
                          font=("Arial Black",10))
 
-    punto_reorden_del.place(x=950, y=120)
+    punto_reorden_add.place(x=950, y=120)
     material_label_10 = tk.Label(ventana_princ, text="Punto Reorden")
     material_label_10.place(x=820, y=120)
     material_label_10.config(bg="white",
                          font=("Arial Black",10))
 
-    max_del.place(x=100, y=240)
+    max_add.place(x=100, y=240)
     material_label_11 = tk.Label(ventana_princ, text="Max")
     material_label_11.place(x=50, y=240)
     material_label_11.config(bg="white",
                          font=("Arial Black",10))
     
-    dias_del.place(x=305, y=240)
+    dias_add.place(x=305, y=240)
     material_label_12 = tk.Label(ventana_princ, text="Dias")
     material_label_12.place(x=250, y=240)
     material_label_12.config(bg="white",
                          font=("Arial Black",10))
 
-    Accion_del.place(x=530, y=240)
+    Accion_add.place(x=530, y=240)
     material_label_13 = tk.Label(ventana_princ, text="Accion")
     material_label_13.place(x=450, y=240)
     material_label_13.config(bg="white",
                          font=("Arial Black",10))
 
-    Qty_to_Order_del.place(x=730, y=240)
+    Qty_to_Order_add.place(x=730, y=240)
     material_label_14 = tk.Label(ventana_princ, text="Qty")
     material_label_14.place(x=680, y=240)
     material_label_14.config(bg="white",
                          font=("Arial Black",10))
 
-    intran_del.place(x=950, y=240)
+    intran_add.place(x=950, y=240)
     material_label_15 = tk.Label(ventana_princ, text="Intran")
     material_label_15.place(x=880, y=240)
     material_label_15.config(bg="white",
                          font=("Arial Black",10))
 
-    comentarios_de_po_del.place(x=210, y=300)
+    comentarios_de_po_add.place(x=210, y=300)
     material_label_16 = tk.Label(ventana_princ, text="Comentarios de po")
     material_label_16.place(x=50, y=300)
     material_label_16.config(bg="white",
                          font=("Arial Black",10))
 
-    notas_del.place(x=430, y=300)
+    notas_add.place(x=430, y=300)
     material_label_17 = tk.Label(ventana_princ, text="Notas")
     material_label_17.place(x=360, y=300)
     material_label_17.config(bg="white",
                          font=("Arial Black",10))
 
-    no_proveedor_del.place(x=730, y=300)
+    no_proveedor_add.place(x=730, y=300)
     material_label_18 = tk.Label(ventana_princ, text="No. de Proveedor")
     material_label_18.place(x=580, y=300)
     material_label_18.config(bg="white",
                          font=("Arial Black",10))
 
-    proveedor_del.place(x=980, y=300)
+    proveedor_add.place(x=980, y=300)
     material_label_19 = tk.Label(ventana_princ, text="Proveedor")
     material_label_19.place(x=880, y=300)
     material_label_19.config(bg="white",
                          font=("Arial Black",10))
 
-    contacto_del.place(x=140, y=360)
+    contacto_add.place(x=140, y=360)
     material_label_20 = tk.Label(ventana_princ, text="Contacto")
     material_label_20.place(x=50, y=360)
     material_label_20.config(bg="white",
                          font=("Arial Black",10))
 
-    sistema_del.place(x=360, y=360)
+    sistema_add.place(x=360, y=360)
     material_label_21 = tk.Label(ventana_princ, text="Sistema")
     material_label_21.place(x=280, y=360)
     material_label_21.config(bg="white",
                          font=("Arial Black",10))
 
-    centro_cuenta_del.place(x=650, y=360)
+    centro_cuenta_add.place(x=650, y=360)
     material_label_22 = tk.Label(ventana_princ, text="Centro de cuenta")
     material_label_22.place(x=500, y=360)
     material_label_22.config(bg="white",
                          font=("Arial Black",10))
 
-    ubicacion_del.place(x=890, y=360)
+    ubicacion_add.place(x=890, y=360)
     material_label_23 = tk.Label(ventana_princ, text="Ubicacion")
     material_label_23.place(x=790, y=360)
     material_label_23.config(bg="white",
                          font=("Arial Black",10))
 
-    centro_del.place(x=120, y=420)
+    centro_add.place(x=120, y=420)
     material_label_24 = tk.Label(ventana_princ, text="Centro")
     material_label_24.place(x=50, y=420)
     material_label_24.config(bg="white",
                          font=("Arial Black",10))
 
-    cuenta_del.place(x=345, y=420)
+    cuenta_add.place(x=345, y=420)
     material_label_25 = tk.Label(ventana_princ, text="Cuenta")
     material_label_25.place(x=270, y=420)
     material_label_25.config(bg="white",
                          font=("Arial Black",10))
 
-    Orden_ubicacion_one_del.place(x=650, y=420)
+    Orden_ubicacion_one_add.place(x=650, y=420)
     material_label_26 = tk.Label(ventana_princ, text="Orden Ubicacion 1")
     material_label_26.place(x=490, y=420)
     material_label_26.config(bg="white",
                          font=("Arial Black",10))
 
-    Orden_ubicacion_two_del.place(x=960, y=420)
+    Orden_ubicacion_two_add.place(x=960, y=420)
     material_label_27 = tk.Label(ventana_princ, text="Orden Ubicacion 2")
     material_label_27.place(x=800, y=420)
     material_label_27.config(bg="white",
                          font=("Arial Black",10))
 
-    category_del.place(x=140, y=480)
-    material_label_28 = tk.Label(ventana_princ, text="Categoria")
-    material_label_28.place(x=50, y=480)
-    material_label_28.config(bg="white",
+    category_add.place(x=140, y=480)
+    material_label_29 = tk.Label(ventana_princ, text="Categoria")
+    material_label_29.place(x=50, y=480)
+    material_label_29.config(bg="white",
                          font=("Arial Black",10))
 
-    po_or_req_del.place(x=400, y=480)
-    material_label_28 = tk.Label(ventana_princ, text="po or req")
-    material_label_28.place(x=300, y=480)
-    material_label_28.config(bg="white",
+    po_or_req_add.place(x=400, y=480)
+    material_label_30 = tk.Label(ventana_princ, text="po or req")
+    material_label_30.place(x=300, y=480)
+    material_label_30.config(bg="white",
                          font=("Arial Black",10))
 
     boton_volver_menu_abc.place(x=1000, y=540)
+    boton_guardar_alta_material.place(x=900, y=540)
 
 def update_materiales():
     clear_window()
@@ -762,67 +972,55 @@ def update_materiales():
 
 #funcion para guardar stock entrada
 def guardar_entrada():
-    #Recuperer el nombre del producto seleccionado en el combobox
     nombre_del_producto = combo.get()
-
-    #Recuperar la cantidad ingresada en el Entry
     cantidad = entry.get()
 
-    #Verificar que los campos no esten vacios
     if nombre_del_producto and cantidad:
         try:
-            #convertir la cantidad a int
             cantidad = int(cantidad)
-     
             cursor.execute("UPDATE dbo.Inventarios SET stock = stock + ? WHERE Nombre_del_producto = ?", (cantidad, nombre_del_producto))
-           
             cursor.execute("SELECT stock, Punto_Reorden FROM dbo.Inventarios WHERE Nombre_del_producto = ?", (nombre_del_producto,))
             resultado_ent = cursor.fetchone()
+            
             if resultado_ent:
                 stock_actual, punto_de_reorden = resultado_ent
-            
-                cursor.execute("INSERT INTO dbo.Entradas (nombre_del_producto, stock_actual, entrada, fecha) VALUES (?, ?, ?, GETDATE())",(nombre_del_producto, stock_actual, cantidad,))
-
+                cursor.execute("INSERT INTO dbo.Entradas (nombre_del_producto, stock_actual, entrada, fecha) VALUES (?, ?, ?, GETDATE())",
+                               (nombre_del_producto, stock_actual, cantidad))
                 if stock_actual > punto_de_reorden:
                     cursor.execute("UPDATE dbo.Inventarios SET Accion = 'Cantidad Suficiente' WHERE Nombre_del_producto = ?", (nombre_del_producto,))
-                    connection.commit()
-
-                    messagebox.showinfo("Exito", "Entrada guardada correctamente")
-                else:
-                    messagebox.showerror("Error", "Producto no encontrado en el inventario")
-
+                connection.commit()
+                messagebox.showinfo("Éxito", "Entrada guardada correctamente")
+            else:
+                messagebox.showerror("Error", "Producto no encontrado en el inventario")
         except Exception as e:
-            messagebox.showerror(f"Error: {e}")
+            messagebox.showerror("Error", f"Error: {e}")
     else:
-        messagebox.showerror("error", f"Por favor, selecciona un producto e ingresa una cantidad.")
+        messagebox.showerror("Error", "Por favor, selecciona un producto e ingresa una cantidad.")
 
 #funcion para guardar stock Salida
 def guardar_salida():
     nombre_del_producto_sal = combo.get()
     cantidad_sal = entry.get()
-    
+
     if nombre_del_producto_sal and cantidad_sal:
         try:
             cantidad_sal = int(cantidad_sal)
-            
             cursor.execute("UPDATE dbo.Inventarios SET stock = stock - ? WHERE Nombre_del_producto = ?", (cantidad_sal, nombre_del_producto_sal))
             cursor.execute("SELECT stock, Punto_Reorden FROM dbo.Inventarios WHERE Nombre_del_producto = ?", (nombre_del_producto_sal,))
             resultado = cursor.fetchone()
-            
+
             if resultado:
                 stock_actual, punto_de_reorden = resultado
-                cursor.execute("INSERT INTO dbo.Salidas (nombre_del_producto, stock_actual, salida, fecha) VALUES (?, ?, ?, GETDATE())", (nombre_del_producto_sal, stock_actual, cantidad_sal,))
-                
+                cursor.execute("INSERT INTO dbo.Salidas (nombre_del_producto, stock_actual, salida, fecha) VALUES (?, ?, ?, GETDATE())",
+                               (nombre_del_producto_sal, stock_actual, cantidad_sal))
                 if stock_actual < punto_de_reorden:
-                    cursor.execute("UPDATE dbo.Inventarios SET Accion = 'Comprar' WHERE Nombre_del_Producto = ?", (nombre_del_producto_sal,))
-                    connection.commit()
-                    messagebox.showinfo("Exito", "Salida guardada correctamente")
-                else:
-                    messagebox.showerror("Error", "Producto no encontrado en el inventario.")
-                    
+                    cursor.execute("UPDATE dbo.Inventarios SET Accion = 'Comprar' WHERE Nombre_del_producto = ?", (nombre_del_producto_sal,))
+                connection.commit()
+                messagebox.showinfo("Éxito", "Salida guardada correctamente")
+            else:
+                messagebox.showerror("Error", "Producto no encontrado en el inventario.")
         except Exception as e:
             messagebox.showerror("Error", f"Error: {e}")
-            
     else:
         messagebox.showerror("Error", "Por favor, selecciona un producto e ingresa una cantidad.")
 
@@ -1048,6 +1246,10 @@ boton_actualizar_producto = tk.Button(ventana_princ, text="Actualizar", command=
 
 boton_volver_menu_abc = tk.Button(ventana_princ, text="volver", command=lambda: (tamano_ventana_dos(), materiales_alta_baja_delete()))
 
+boton_guardar_alta_material = tk.Button(ventana_princ, text="Guardar", command=guardar_datos_alta)
+boton_para_escoger_produto_del = tk.Button(ventana_princ, text="Lista de productos", command=ventana_lista_de_productos_del)
+
+
 #Campos de texto y etiquetas para modulo de eliminar productos
 no_parte_interno_del = tk.Entry(ventana_princ)
 nombre_producto_del = tk.Entry(ventana_princ)
@@ -1079,7 +1281,40 @@ Orden_ubicacion_one_del = tk.Entry(ventana_princ)
 Orden_ubicacion_two_del = tk.Entry(ventana_princ)
 category_del = tk.Entry(ventana_princ)
 po_or_req_del = tk.Entry(ventana_princ)
+#------------------------------------------------------------------------------
 
+##Campos de texto y etiquetas para modulo de agregar productos
+no_parte_interno_add = tk.Entry(ventana_princ)
+nombre_producto_add = tk.Entry(ventana_princ)
+no_parte_add = tk.Entry(ventana_princ)
+presentancion_add = tk.Entry(ventana_princ)
+stock_add = tk.Entry(ventana_princ)
+precio_unitario_add = tk.Entry(ventana_princ)
+moneda_add = tk.Entry(ventana_princ)
+lead_time_add = tk.Entry(ventana_princ)
+demanda_diaria_add = tk.Entry(ventana_princ)
+min_add = tk.Entry(ventana_princ)
+punto_reorden_add = tk.Entry(ventana_princ)
+max_add = tk.Entry(ventana_princ)
+dias_add = tk.Entry(ventana_princ)
+Accion_add = tk.Entry(ventana_princ)
+Qty_to_Order_add = tk.Entry(ventana_princ)
+intran_add = tk.Entry(ventana_princ)
+comentarios_de_po_add = tk.Entry(ventana_princ)
+notas_add = tk.Entry(ventana_princ)
+no_proveedor_add = tk.Entry(ventana_princ)
+proveedor_add = tk.Entry(ventana_princ)
+contacto_add = tk.Entry(ventana_princ)
+sistema_add = tk.Entry(ventana_princ)
+centro_cuenta_add = tk.Entry(ventana_princ)
+ubicacion_add = tk.Entry(ventana_princ)
+centro_add = tk.Entry(ventana_princ)
+cuenta_add = tk.Entry(ventana_princ)
+Orden_ubicacion_one_add = tk.Entry(ventana_princ)
+Orden_ubicacion_two_add = tk.Entry(ventana_princ)
+category_add = tk.Entry(ventana_princ)
+po_or_req_add = tk.Entry(ventana_princ)
+#------------------------------------------------------------
 
 stock_textbox = tk.Entry(ventana_princ)
 accion_textbox = tk.Entry(ventana_princ)
@@ -1087,8 +1322,9 @@ accion_textbox = tk.Entry(ventana_princ)
 stock_int = tk.Entry(ventana_princ)
 
 combo = ttk.Combobox(ventana_princ, state="readonly", font=Font(size=15))
+combobox_productos_del = ttk.Combobox(ventana_princ, state="readonly", font=Font(size=15))
 
 show_main()
 
-#Ejecutar interfaz principal
+
 ventana_princ.mainloop()

@@ -17,7 +17,7 @@ import datetime
 from sqlalchemy.orm import state
 
 Server = "SFX02EU8JX4HK3"
-Database = "miscelaneos_db "
+Database = "SFX_MTY_MRO "
 user = "RamiroSFXPruebas"
 password = "Danganronpa11"
 
@@ -425,6 +425,10 @@ def ventana_lista_de_productos_del():
             ventana_princ.deiconify()
             ventana_prod_del.destroy()
 
+    def on_closing():
+        ventana_princ.deiconify()
+        ventana_prod_del.destroy()
+
     ventana_princ.withdraw()
 
     ventana_prod_del = tk.Toplevel(ventana_princ)
@@ -433,6 +437,8 @@ def ventana_lista_de_productos_del():
     ventana_prod_del.resizable(width=False, height=False)
     ventana_prod_del.config(bg="white")
     ventana_prod_del.iconbitmap("avion.ico")
+
+    ventana_prod_del.protocol("WM_DELETE_WINDOW", on_closing)
 
     combobox_productos_del = ttk.Combobox(ventana_prod_del)
     combobox_productos_del.place(x=250, y=50)
@@ -553,15 +559,21 @@ def eliminar_matrial_inventario():
 #Funciones completas para dar de alta un nuevo material <----
 def insertar_nuevo_material(datos):
     try:
-        insert_material = "INSERT INTO dbo.Inventarios (No_parte_interno, Nombre_del_producto, No_Parte, Presentacion, stock, precio_unitario, Moneda,Lead_Time, Demanda_diaria, Min, Punto_Reorden, Max, Dias,Accion, Qty_to_Order,intran, Comentarios_de_PO, Notas,No_Proveedor,Proveedor,Contacto,Sistema,Centro_cuenta, Ubicacion, Centro, Cuenta, Orden_ubicacion_1, Orden_ubicacion_2,Category,PO_or_REQ )VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
-            
+        insert_material = """
+        INSERT INTO dbo.Inventarios (
+            No_parte_interno, Nombre_del_producto, No_Parte, Presentacion, stock, precio_unitario, Moneda,
+            Lead_Time, Demanda_diaria, Min, Punto_Reorden, Max, Dias, Accion, Qty_to_Order, intran, 
+            Comentarios_de_PO, Notas, No_Proveedor, Proveedor, Contacto, Sistema, Centro_cuenta, 
+            Ubicacion, Centro, Cuenta, Orden_ubicacion_1, Orden_ubicacion_2, Category, PO_or_REQ
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """
+        
         cursor.execute(insert_material, tuple(datos.values()))
         connection.commit()
         
-        messagebox.showinfo("Exito", "Datos agregados correctamente")
+        messagebox.showinfo("Éxito", "Datos agregados correctamente")
     except Exception as e:
-        messagebox.showerror("Error", f"Ocurrio un error al insertar los datos")
-
+        messagebox.showerror("Error", f"Ocurrió un error al insertar los datos: {e}")
 
 def guardar_datos_alta():
     datos = {
@@ -596,6 +608,13 @@ def guardar_datos_alta():
         'Category': category_add.get(),
         'PO_or_REQ': po_or_req_add.get()
     }
+
+    # Validación de campos obligatorios
+    campos_obligatorios = ['No_parte_interno', 'Nombre_del_producto', 'No_Parte']
+    for campo in campos_obligatorios:
+        if not datos[campo]:
+            messagebox.showerror("Error", f"El campo '{campo}' es obligatorio.")
+            return
 
     insertar_nuevo_material(datos)
 
@@ -988,6 +1007,10 @@ def ventana_lista_de_productos_upd():
             ventana_princ.deiconify()
             ventana_prod_upd.destroy()
 
+    def on_closing():
+        ventana_princ.deiconify()
+        ventana_prod_upd.destroy()
+
     ventana_princ.withdraw()
 
     ventana_prod_upd = tk.Toplevel(ventana_princ)
@@ -996,6 +1019,8 @@ def ventana_lista_de_productos_upd():
     ventana_prod_upd.resizable(width=False, height=False)
     ventana_prod_upd.config(bg="white")
     ventana_prod_upd.iconbitmap("avion.ico")
+
+    ventana_prod_upd.protocol("WM_DELETE_WINDOW", on_closing)
 
     combobox_productos_upd = ttk.Combobox(ventana_prod_upd)
     combobox_productos_upd.place(x=250, y=50)
@@ -1047,7 +1072,9 @@ def cargar_datos_en_ventana_upd(fila_del_producto):
     punto_reorden_upd.insert(0, str(fila_del_producto.Punto_Reorden))
     max_upd.insert(0, str(fila_del_producto.Max))
     dias_upd.insert(0, str(fila_del_producto.Dias))
+    Accion_upd.config(state='normal')
     Accion_upd.insert(0, str(fila_del_producto.Accion))
+    Accion_upd.config(state='readonly')
     Qty_to_Order_upd.insert(0, str(fila_del_producto.Qty_to_Order))
     intran_upd.insert(0, str(fila_del_producto.intran))
     comentarios_de_po_upd.insert(0, str(fila_del_producto.Comentarios_de_PO))
@@ -1065,41 +1092,48 @@ def cargar_datos_en_ventana_upd(fila_del_producto):
     category_upd.insert(0, str(fila_del_producto.Category))
     po_or_req_upd.insert(0, str(fila_del_producto.PO_or_REQ))
 
+def is_numeric(value):
+    try:
+        float(value)
+        return True
+    except ValueError:
+        return False
+
 def update_material():
     try:
         cursor = connection.cursor()
 
         valores = (
-            no_parte_interno_upd.get(), 
-            nombre_producto_upd.get(), 
-            no_parte_upd.get(), 
+            no_parte_interno_upd.get(),
+            nombre_producto_upd.get(),
+            no_parte_upd.get(),
             presentancion_upd.get(),
-            float(stock_upd.get()), 
-            float(precio_unitario_upd.get()), 
-            moneda_upd.get(), 
-            float(lead_time_upd.get()), 
-            float(demanda_diaria_upd.get()),
-            float(min_upd.get()), 
-            float(punto_reorden_upd.get()),  
-            float(max_upd.get()), 
-            float(dias_upd.get()), 
-            Accion_upd.get(), 
-            float(Qty_to_Order_upd.get()),  
+            stock_upd.get(),
+            precio_unitario_upd.get(),
+            moneda_upd.get(),
+            lead_time_upd.get(),
+            demanda_diaria_upd.get(),
+            min_upd.get(),
+            punto_reorden_upd.get(),
+            max_upd.get(),
+            dias_upd.get(),
+            Accion_upd.get(),
+            Qty_to_Order_upd.get(),
             intran_upd.get(),
-            comentarios_de_po_upd.get(), 
-            notas_upd.get(), 
-            no_proveedor_upd.get(), 
+            comentarios_de_po_upd.get(),
+            notas_upd.get(),
+            no_proveedor_upd.get(),
             proveedor_upd.get(),
-            contacto_upd.get(), 
-            sistema_upd.get(), 
-            centro_cuenta_upd.get(), 
+            contacto_upd.get(),
+            sistema_upd.get(),
+            centro_cuenta_upd.get(),
             ubicacion_upd.get(),
-            centro_upd.get(), 
-            cuenta_upd.get(), 
-            Orden_ubicacion_one_upd.get(), 
+            centro_upd.get(),
+            cuenta_upd.get(),
+            Orden_ubicacion_one_upd.get(),
             Orden_ubicacion_two_upd.get(),
-            category_upd.get(), 
-            po_or_req_upd.get(), 
+            category_upd.get(),
+            po_or_req_upd.get(),
             nombre_producto_upd.get()
         )
 
@@ -1113,12 +1147,17 @@ def update_material():
         connection.commit()
         messagebox.showinfo("Éxito", "Producto actualizado correctamente")
 
-    except Exception as e:
+    except ValueError as ve:
+        messagebox.showerror("Error", f"Error en la validación de datos: {ve}")
+        print(f"Error en la validación de datos: {ve}")
+    except pyodbc.Error as e:
         messagebox.showerror("Error", f"Error al actualizar el producto: {e}")
         print(f"Error al actualizar el producto: {e}")
-
     finally:
         cursor.close()
+
+
+        
 
 
 #funcion para guardar stock entrada

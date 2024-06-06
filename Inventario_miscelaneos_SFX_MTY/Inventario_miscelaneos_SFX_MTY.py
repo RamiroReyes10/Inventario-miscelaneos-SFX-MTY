@@ -18,11 +18,11 @@ from sqlalchemy.orm import state
 
 Server = "SFX02EU8JX4HK3"
 Database = "SFX_MTY_MRO "
-user = "RamiroSFXPruebas"
-password = "Danganronpa11"
+#user = "RamiroSFXPruebas"
+#password = "Danganronpa11"
 
 from sqlalchemy.engine import URL
-cadena_conection = f"DRIVER={{SQL SERVER}};SERVER={Server};DATABASE={Database};UID={user};PWD={password}"
+cadena_conection = f"DRIVER={{SQL SERVER}};SERVER={Server};DATABASE={Database};Truested_connection=yes;"             #"UID={user};PWD={password}"
 url_conection = URL.create("mssql+pyodbc", query={"odbc_connect": cadena_conection})
 
 from sqlalchemy import create_engine, values
@@ -215,12 +215,6 @@ def materiales_alta_baja_delete():
 def baja_materiales():
     clear_window()
   
-    no_parte_interno_del.place(x=250, y=60)
-    material_label = tk.Label(ventana_princ, text="Numero de parte interno")
-    material_label.place(x=50, y=60)
-    material_label.config(bg="white",
-                         font=("Arial Black",10))
-
     nombre_producto_del.place(x=580, y=60)
     material_label_1 = tk.Label(ventana_princ, text="Nombre del producto")
     material_label_1.place(x=400, y=60)
@@ -335,12 +329,6 @@ def baja_materiales():
     material_label_19.config(bg="white",
                          font=("Arial Black",10))
 
-    contacto_del.place(x=140, y=360)
-    material_label_20 = tk.Label(ventana_princ, text="Contacto")
-    material_label_20.place(x=50, y=360)
-    material_label_20.config(bg="white",
-                         font=("Arial Black",10))
-
     sistema_del.place(x=360, y=360)
     material_label_21 = tk.Label(ventana_princ, text="Sistema")
     material_label_21.place(x=280, y=360)
@@ -371,30 +359,6 @@ def baja_materiales():
     material_label_25.config(bg="white",
                          font=("Arial Black",10))
 
-    Orden_ubicacion_one_del.place(x=650, y=420)
-    material_label_26 = tk.Label(ventana_princ, text="Orden Ubicacion 1")
-    material_label_26.place(x=490, y=420)
-    material_label_26.config(bg="white",
-                         font=("Arial Black",10))
-
-    Orden_ubicacion_two_del.place(x=960, y=420)
-    material_label_27 = tk.Label(ventana_princ, text="Orden Ubicacion 2")
-    material_label_27.place(x=800, y=420)
-    material_label_27.config(bg="white",
-                         font=("Arial Black",10))
-
-    category_del.place(x=140, y=480)
-    material_label_29 = tk.Label(ventana_princ, text="Categoria")
-    material_label_29.place(x=50, y=480)
-    material_label_29.config(bg="white",
-                         font=("Arial Black",10))
-
-    po_or_req_del.place(x=400, y=480)
-    material_label_30 = tk.Label(ventana_princ, text="po or req")
-    material_label_30.place(x=300, y=480)
-    material_label_30.config(bg="white",
-                         font=("Arial Black",10))
-
     boton_volver_menu_abc.place(x=1000, y=540)
     boton_para_escoger_produto_del.place(x=500, y=540)
     
@@ -409,11 +373,12 @@ def cargar_fila_producto(producto_seleccionado):
         if fila_producto:
             return fila_producto
         else:
-            print("No se encontró ninguna fila para el producto seleccionado")
+            messagebox.showerror(f"Error", "No se encontró el producto seleccionado")
             return None
     except Exception as e:
-        print(f"Error al cargar la fila del producto: {e}")
+        print(f"Error", "Error al cargar la fila del producto: {e}")
         return None
+
 
     
 def ventana_lista_de_productos_del():
@@ -460,7 +425,6 @@ def ventana_lista_de_productos_del():
     
 
 def limpiar_campos_del():
-    no_parte_interno_del.delete(0, tk.END)
     nombre_producto_del.delete(0, tk.END)
     no_parte_del.delete(0, tk.END)
     presentancion_del.delete(0, tk.END)
@@ -480,22 +444,15 @@ def limpiar_campos_del():
     notas_del.delete(0, tk.END)
     no_proveedor_del.delete(0, tk.END)
     proveedor_del.delete(0, tk.END)
-    contacto_del.delete(0, tk.END)
     sistema_del.delete(0, tk.END)
     centro_cuenta_del.delete(0, tk.END)
     ubicacion_del.delete(0, tk.END)
     centro_del.delete(0, tk.END)
     cuenta_del.delete(0, tk.END)
-    Orden_ubicacion_one_del.delete(0, tk.END)
-    Orden_ubicacion_two_del.delete(0, tk.END)
-    category_del.delete(0, tk.END)
-    po_or_req_del.delete(0, tk.END) 
-
     
 def cargar_datos_en_ventana_del(fila_del_producto):
     limpiar_campos_del() 
 
-    no_parte_interno_del.insert(0, str(fila_del_producto.No_parte_interno))
     nombre_producto_del.insert(0, str(fila_del_producto.Nombre_del_producto))
     no_parte_del.insert(0, str(fila_del_producto.No_Parte))
     presentancion_del.insert(0, str(fila_del_producto.Presentacion))
@@ -515,16 +472,11 @@ def cargar_datos_en_ventana_del(fila_del_producto):
     notas_del.insert(0, str(fila_del_producto.Notas))
     no_proveedor_del.insert(0, str(fila_del_producto.No_Proveedor))
     proveedor_del.insert(0, str(fila_del_producto.Proveedor))
-    contacto_del.insert(0, str(fila_del_producto.Contacto))
     sistema_del.insert(0, str(fila_del_producto.Sistema))
     centro_cuenta_del.insert(0, str(fila_del_producto.Centro_cuenta))
     ubicacion_del.insert(0, str(fila_del_producto.Ubicacion))
     centro_del.insert(0, str(fila_del_producto.Centro))
     cuenta_del.insert(0, str(fila_del_producto.Cuenta))
-    Orden_ubicacion_one_del.insert(0, str(fila_del_producto.Orden_ubicacion_1))
-    Orden_ubicacion_two_del.insert(0, str(fila_del_producto.Orden_ubicacion_2))
-    category_del.insert(0, str(fila_del_producto.Category))
-    po_or_req_del.insert(0, str(fila_del_producto.PO_or_REQ))
     
 def eliminar_matrial_inventario():
      nombre_producto =  nombre_producto_del.get()
@@ -537,8 +489,8 @@ def eliminar_matrial_inventario():
                   'DRIVER={SQL Server};'
                    f'SERVER={Server};'
                    f'DATABASE={Database};'
-                   f'UID={user};'
-                   f'PWD={password}'
+                   #f'UID={user};'
+                   #f'PWD={password}'
                    )
                 
                 cursor = connection.cursor()
@@ -561,11 +513,11 @@ def insertar_nuevo_material(datos):
     try:
         insert_material = """
         INSERT INTO dbo.Inventarios (
-            No_parte_interno, Nombre_del_producto, No_Parte, Presentacion, stock, precio_unitario, Moneda,
+            Nombre_del_producto, No_Parte, Presentacion, stock, precio_unitario, Moneda,
             Lead_Time, Demanda_diaria, Min, Punto_Reorden, Max, Dias, Accion, Qty_to_Order, intran, 
-            Comentarios_de_PO, Notas, No_Proveedor, Proveedor, Contacto, Sistema, Centro_cuenta, 
-            Ubicacion, Centro, Cuenta, Orden_ubicacion_1, Orden_ubicacion_2, Category, PO_or_REQ
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            Comentarios_de_PO, Notas, No_Proveedor, Proveedor, Sistema, Centro_cuenta, 
+            Ubicacion, Centro, Cuenta
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """
         
         cursor.execute(insert_material, tuple(datos.values()))
@@ -577,7 +529,6 @@ def insertar_nuevo_material(datos):
 
 def guardar_datos_alta():
     datos = {
-        'No_parte_interno': no_parte_interno_add.get(),
         'Nombre_del_producto': nombre_producto_add.get(),
         'No_Parte': no_parte_add.get(),
         'Presentacion': presentancion_add.get(),
@@ -597,20 +548,15 @@ def guardar_datos_alta():
         'Notas': notas_add.get(),
         'No_Proveedor': no_proveedor_add.get(),
         'Proveedor': proveedor_add.get(),
-        'Contacto': contacto_add.get(),
         'Sistema': sistema_add.get(),
         'Centro_cuenta': centro_cuenta_add.get(),
         'Ubicacion': ubicacion_add.get(),
         'Centro': centro_add.get(),
         'Cuenta': cuenta_add.get(),
-        'Orden_ubicacion_1': Orden_ubicacion_one_add.get(),
-        'Orden_ubicacion_2': Orden_ubicacion_two_add.get(),
-        'Category': category_add.get(),
-        'PO_or_REQ': po_or_req_add.get()
     }
 
     # Validación de campos obligatorios
-    campos_obligatorios = ['No_parte_interno', 'Nombre_del_producto', 'No_Parte']
+    campos_obligatorios = ['Nombre_del_producto', 'No_Parte']
     for campo in campos_obligatorios:
         if not datos[campo]:
             messagebox.showerror("Error", f"El campo '{campo}' es obligatorio.")
@@ -620,12 +566,6 @@ def guardar_datos_alta():
 
 def alta_materiales():
     clear_window()
-
-    no_parte_interno_add.place(x=250, y=60)
-    material_label = tk.Label(ventana_princ, text="Numero de parte interno")
-    material_label.place(x=50, y=60)
-    material_label.config(bg="white",
-                         font=("Arial Black",10))
 
     nombre_producto_add.place(x=580, y=60)
     material_label_1 = tk.Label(ventana_princ, text="Nombre del producto")
@@ -741,12 +681,6 @@ def alta_materiales():
     material_label_19.config(bg="white",
                          font=("Arial Black",10))
 
-    contacto_add.place(x=140, y=360)
-    material_label_20 = tk.Label(ventana_princ, text="Contacto")
-    material_label_20.place(x=50, y=360)
-    material_label_20.config(bg="white",
-                         font=("Arial Black",10))
-
     sistema_add.place(x=360, y=360)
     material_label_21 = tk.Label(ventana_princ, text="Sistema")
     material_label_21.place(x=280, y=360)
@@ -777,30 +711,6 @@ def alta_materiales():
     material_label_25.config(bg="white",
                          font=("Arial Black",10))
 
-    Orden_ubicacion_one_add.place(x=650, y=420)
-    material_label_26 = tk.Label(ventana_princ, text="Orden Ubicacion 1")
-    material_label_26.place(x=490, y=420)
-    material_label_26.config(bg="white",
-                         font=("Arial Black",10))
-
-    Orden_ubicacion_two_add.place(x=960, y=420)
-    material_label_27 = tk.Label(ventana_princ, text="Orden Ubicacion 2")
-    material_label_27.place(x=800, y=420)
-    material_label_27.config(bg="white",
-                         font=("Arial Black",10))
-
-    category_add.place(x=140, y=480)
-    material_label_29 = tk.Label(ventana_princ, text="Categoria")
-    material_label_29.place(x=50, y=480)
-    material_label_29.config(bg="white",
-                         font=("Arial Black",10))
-
-    po_or_req_add.place(x=400, y=480)
-    material_label_30 = tk.Label(ventana_princ, text="po or req")
-    material_label_30.place(x=300, y=480)
-    material_label_30.config(bg="white",
-                         font=("Arial Black",10))
-
     boton_volver_menu_abc.place(x=1000, y=540)
     boton_guardar_alta_material.place(x=900, y=540)
     
@@ -808,12 +718,6 @@ def alta_materiales():
 
 def update_materiales():
     clear_window()
-
-    no_parte_interno_upd.place(x=250, y=60)
-    material_label = tk.Label(ventana_princ, text="Numero de parte interno")
-    material_label.place(x=50, y=60)
-    material_label.config(bg="white",
-                         font=("Arial Black",10))
 
     nombre_producto_upd.place(x=580, y=60)
     material_label_1 = tk.Label(ventana_princ, text="Nombre del producto")
@@ -929,12 +833,6 @@ def update_materiales():
     material_label_19.config(bg="white",
                          font=("Arial Black",10))
 
-    contacto_upd.place(x=140, y=360)
-    material_label_20 = tk.Label(ventana_princ, text="Contacto")
-    material_label_20.place(x=50, y=360)
-    material_label_20.config(bg="white",
-                         font=("Arial Black",10))
-
     sistema_upd.place(x=360, y=360)
     material_label_21 = tk.Label(ventana_princ, text="Sistema")
     material_label_21.place(x=280, y=360)
@@ -963,30 +861,6 @@ def update_materiales():
     material_label_25 = tk.Label(ventana_princ, text="Cuenta")
     material_label_25.place(x=270, y=420)
     material_label_25.config(bg="white",
-                         font=("Arial Black",10))
-
-    Orden_ubicacion_one_upd.place(x=650, y=420)
-    material_label_26 = tk.Label(ventana_princ, text="Orden Ubicacion 1")
-    material_label_26.place(x=490, y=420)
-    material_label_26.config(bg="white",
-                         font=("Arial Black",10))
-
-    Orden_ubicacion_two_upd.place(x=960, y=420)
-    material_label_27 = tk.Label(ventana_princ, text="Orden Ubicacion 2")
-    material_label_27.place(x=800, y=420)
-    material_label_27.config(bg="white",
-                         font=("Arial Black",10))
-
-    category_upd.place(x=140, y=480)
-    material_label_28 = tk.Label(ventana_princ, text="Categoria")
-    material_label_28.place(x=50, y=480)
-    material_label_28.config(bg="white",
-                         font=("Arial Black",10))
-
-    po_or_req_upd.place(x=400, y=480)
-    material_label_29 = tk.Label(ventana_princ, text="po or req")
-    material_label_29.place(x=300, y=480)
-    material_label_29.config(bg="white",
                          font=("Arial Black",10))
 
     boton_volver_menu_abc.place(x=1000, y=540)
@@ -1042,13 +916,12 @@ def ventana_lista_de_productos_upd():
     
 def limpiar_campos_upd():
     campos = [
-        no_parte_interno_upd, nombre_producto_upd, no_parte_upd, presentancion_upd, stock_upd,
+        nombre_producto_upd, no_parte_upd, presentancion_upd, stock_upd,
         precio_unitario_upd, moneda_upd, lead_time_upd, demanda_diaria_upd, min_upd,
         punto_reorden_upd, max_upd, dias_upd, Accion_upd, Qty_to_Order_upd,
         intran_upd, comentarios_de_po_upd, notas_upd, no_proveedor_upd,
-        proveedor_upd, contacto_upd, sistema_upd, centro_cuenta_upd,
-        ubicacion_upd, centro_upd, cuenta_upd, Orden_ubicacion_one_upd,
-        Orden_ubicacion_two_upd, category_upd, po_or_req_upd
+        proveedor_upd, sistema_upd, centro_cuenta_upd,
+        ubicacion_upd, centro_upd, cuenta_upd
     ]
     
     for campo in campos:
@@ -1057,7 +930,6 @@ def limpiar_campos_upd():
 def cargar_datos_en_ventana_upd(fila_del_producto):
     limpiar_campos_upd() 
 
-    no_parte_interno_upd.insert(0, str(fila_del_producto.No_parte_interno))
     nombre_producto_upd.insert(0, str(fila_del_producto.Nombre_del_producto))
     no_parte_upd.insert(0, str(fila_del_producto.No_Parte))
     presentancion_upd.insert(0, str(fila_del_producto.Presentacion))
@@ -1081,16 +953,11 @@ def cargar_datos_en_ventana_upd(fila_del_producto):
     notas_upd.insert(0, str(fila_del_producto.Notas))
     no_proveedor_upd.insert(0, str(fila_del_producto.No_Proveedor))
     proveedor_upd.insert(0, str(fila_del_producto.Proveedor))
-    contacto_upd.insert(0, str(fila_del_producto.Contacto))
     sistema_upd.insert(0, str(fila_del_producto.Sistema))
     centro_cuenta_upd.insert(0, str(fila_del_producto.Centro_cuenta))
     ubicacion_upd.insert(0, str(fila_del_producto.Ubicacion))
     centro_upd.insert(0, str(fila_del_producto.Centro))
     cuenta_upd.insert(0, str(fila_del_producto.Cuenta))
-    Orden_ubicacion_one_upd.insert(0, str(fila_del_producto.Orden_ubicacion_1))
-    Orden_ubicacion_two_upd.insert(0, str(fila_del_producto.Orden_ubicacion_2))
-    category_upd.insert(0, str(fila_del_producto.Category))
-    po_or_req_upd.insert(0, str(fila_del_producto.PO_or_REQ))
 
 def is_numeric(value):
     try:
@@ -1104,7 +971,6 @@ def update_material():
         cursor = connection.cursor()
 
         valores = (
-            no_parte_interno_upd.get(),
             nombre_producto_upd.get(),
             no_parte_upd.get(),
             presentancion_upd.get(),
@@ -1124,22 +990,17 @@ def update_material():
             notas_upd.get(),
             no_proveedor_upd.get(),
             proveedor_upd.get(),
-            contacto_upd.get(),
             sistema_upd.get(),
             centro_cuenta_upd.get(),
             ubicacion_upd.get(),
             centro_upd.get(),
             cuenta_upd.get(),
-            Orden_ubicacion_one_upd.get(),
-            Orden_ubicacion_two_upd.get(),
-            category_upd.get(),
-            po_or_req_upd.get(),
             nombre_producto_upd.get()
         )
 
         query = """
             UPDATE dbo.Inventarios
-            SET No_parte_interno = ?, Nombre_del_producto = ?, No_Parte = ?, Presentacion = ?, stock = ?, precio_unitario = ?, Moneda = ?, Lead_Time = ?, Demanda_diaria = ?, Min = ?, Punto_Reorden = ?, Max = ?, Dias = ?, Accion = ?, Qty_to_Order = ?, intran = ?, Comentarios_de_PO = ?, Notas = ?, No_Proveedor = ?, Proveedor = ?, Contacto = ?, Sistema = ?, Centro_cuenta = ?, Ubicacion = ?, Centro = ?, Cuenta = ?, Orden_ubicacion_1 = ?, Orden_ubicacion_2 = ?, Category = ?, PO_or_REQ = ?
+            SET Nombre_del_producto = ?, No_Parte = ?, Presentacion = ?, stock = ?, precio_unitario = ?, Moneda = ?, Lead_Time = ?, Demanda_diaria = ?, Min = ?, Punto_Reorden = ?, Max = ?, Dias = ?, Accion = ?, Qty_to_Order = ?, intran = ?, Comentarios_de_PO = ?, Notas = ?, No_Proveedor = ?, Proveedor = ?, Sistema = ?, Centro_cuenta = ?, Ubicacion = ?, Centro = ?, Cuenta = ?
             WHERE Nombre_del_producto = ?
         """
 
@@ -1155,9 +1016,6 @@ def update_material():
         print(f"Error al actualizar el producto: {e}")
     finally:
         cursor.close()
-
-
-        
 
 
 #funcion para guardar stock entrada
